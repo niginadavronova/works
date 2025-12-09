@@ -1,0 +1,291 @@
+
+
+import pandas as pd
+import numpy as np
+     
+
+from google.colab import files
+import pandas as pd
+
+# Upload file
+uploaded = files.upload()
+
+# Get the uploaded filename
+for filename in uploaded.keys():
+    print('Uploaded file:', filename)
+    df = pd.read_csv(filename)
+
+# Show the first 5 rows
+df.head()
+     
+Upload widget is only available when the cell has been executed in the current browser session. Please rerun this cell to enable.
+Saving data.csv to data.csv
+Uploaded file: data.csv
+Age	Height_cm	Weight_kg	Position	Training_Hours_Per_Week	Matches_Played_Past_Season	Previous_Injury_Count	Knee_Strength_Score	Hamstring_Flexibility	Reaction_Time_ms	Balance_Test_Score	Sprint_Speed_10m_s	Agility_Score	Sleep_Hours_Per_Night	Stress_Level_Score	Nutrition_Quality_Score	Warmup_Routine_Adherence	Injury_Next_Season	BMI
+0	22	173	64	Midfielder	11.575308	36	1	77.460279	79.115738	284.487853	91.212476	5.874630	77.599705	8.238293	46.616415	81.472206	1	0	21.383942
+1	18	170	67	Midfielder	12.275869	37	2	72.634442	82.541688	250.579249	87.294078	5.796269	94.418987	8.983737	49.368037	81.056677	1	0	23.183391
+2	22	186	75	Forward	12.254896	12	2	77.064490	75.943631	269.119918	83.440688	5.731209	70.179176	7.229193	43.132808	64.877457	0	1	21.678807
+3	20	172	62	Defender	9.006678	11	1	82.810232	73.878324	226.376412	87.591894	6.220212	83.473824	7.681029	51.528529	89.824744	1	0	20.957274
+4	18	172	94	Midfielder	12.683668	10	2	76.772859	76.653043	229.021042	83.125161	5.385958	87.037256	6.728091	52.379718	71.569197	0	1	31.773932
+
+df = pd.read_csv('data.csv')
+     
+
+df.info()
+     
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 800 entries, 0 to 799
+Data columns (total 19 columns):
+ #   Column                      Non-Null Count  Dtype  
+---  ------                      --------------  -----  
+ 0   Age                         800 non-null    int64  
+ 1   Height_cm                   800 non-null    int64  
+ 2   Weight_kg                   800 non-null    int64  
+ 3   Position                    800 non-null    object 
+ 4   Training_Hours_Per_Week     800 non-null    float64
+ 5   Matches_Played_Past_Season  800 non-null    int64  
+ 6   Previous_Injury_Count       800 non-null    int64  
+ 7   Knee_Strength_Score         800 non-null    float64
+ 8   Hamstring_Flexibility       800 non-null    float64
+ 9   Reaction_Time_ms            800 non-null    float64
+ 10  Balance_Test_Score          800 non-null    float64
+ 11  Sprint_Speed_10m_s          800 non-null    float64
+ 12  Agility_Score               800 non-null    float64
+ 13  Sleep_Hours_Per_Night       800 non-null    float64
+ 14  Stress_Level_Score          800 non-null    float64
+ 15  Nutrition_Quality_Score     800 non-null    float64
+ 16  Warmup_Routine_Adherence    800 non-null    int64  
+ 17  Injury_Next_Season          800 non-null    int64  
+ 18  BMI                         800 non-null    float64
+dtypes: float64(11), int64(7), object(1)
+memory usage: 118.9+ KB
+
+df.head()
+     
+Age	Height_cm	Weight_kg	Position	Training_Hours_Per_Week	Matches_Played_Past_Season	Previous_Injury_Count	Knee_Strength_Score	Hamstring_Flexibility	Reaction_Time_ms	Balance_Test_Score	Sprint_Speed_10m_s	Agility_Score	Sleep_Hours_Per_Night	Stress_Level_Score	Nutrition_Quality_Score	Warmup_Routine_Adherence	Injury_Next_Season	BMI
+0	22	173	64	Midfielder	11.575308	36	1	77.460279	79.115738	284.487853	91.212476	5.874630	77.599705	8.238293	46.616415	81.472206	1	0	21.383942
+1	18	170	67	Midfielder	12.275869	37	2	72.634442	82.541688	250.579249	87.294078	5.796269	94.418987	8.983737	49.368037	81.056677	1	0	23.183391
+2	22	186	75	Forward	12.254896	12	2	77.064490	75.943631	269.119918	83.440688	5.731209	70.179176	7.229193	43.132808	64.877457	0	1	21.678807
+3	20	172	62	Defender	9.006678	11	1	82.810232	73.878324	226.376412	87.591894	6.220212	83.473824	7.681029	51.528529	89.824744	1	0	20.957274
+4	18	172	94	Midfielder	12.683668	10	2	76.772859	76.653043	229.021042	83.125161	5.385958	87.037256	6.728091	52.379718	71.569197	0	1	31.773932
+
+df.drop(['Hamstring_Flexibility', 'Reaction_Time_ms', 'Sprint_Speed_10m_s'], axis = 1, inplace = True)
+     
+
+df.info()
+     
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 800 entries, 0 to 799
+Data columns (total 16 columns):
+ #   Column                      Non-Null Count  Dtype  
+---  ------                      --------------  -----  
+ 0   Age                         800 non-null    int64  
+ 1   Height_cm                   800 non-null    int64  
+ 2   Weight_kg                   800 non-null    int64  
+ 3   Position                    800 non-null    object 
+ 4   Training_Hours_Per_Week     800 non-null    float64
+ 5   Matches_Played_Past_Season  800 non-null    int64  
+ 6   Previous_Injury_Count       800 non-null    int64  
+ 7   Knee_Strength_Score         800 non-null    float64
+ 8   Balance_Test_Score          800 non-null    float64
+ 9   Agility_Score               800 non-null    float64
+ 10  Sleep_Hours_Per_Night       800 non-null    float64
+ 11  Stress_Level_Score          800 non-null    float64
+ 12  Nutrition_Quality_Score     800 non-null    float64
+ 13  Warmup_Routine_Adherence    800 non-null    int64  
+ 14  Injury_Next_Season          800 non-null    int64  
+ 15  BMI                         800 non-null    float64
+dtypes: float64(8), int64(7), object(1)
+memory usage: 100.1+ KB
+
+df['Position'].value_counts()
+     
+count
+Position	
+Midfielder	213
+Defender	204
+Forward	197
+Goalkeeper	186
+
+dtype: int64
+
+
+     
+
+df.isnull().sum() # This shows how many missing values each column has.
+
+     
+0
+Age	0
+Height_cm	0
+Weight_kg	0
+Position	0
+Training_Hours_Per_Week	0
+Matches_Played_Past_Season	0
+Previous_Injury_Count	0
+Knee_Strength_Score	0
+Balance_Test_Score	0
+Agility_Score	0
+Sleep_Hours_Per_Night	0
+Stress_Level_Score	0
+Nutrition_Quality_Score	0
+Warmup_Routine_Adherence	0
+Injury_Next_Season	0
+BMI	0
+
+dtype: int64
+
+
+     
+
+def change_position(value):
+  value = str(value).lower()
+  if value == 'goalkeeper':
+      return 0
+  elif value == 'defender':
+      return 1
+  elif value == 'midfielder':
+      return 2
+  elif value == 'forward':
+      return 3
+
+
+
+df['Position'] = df['Position'].apply(change_position)
+
+
+     
+
+df['Position'].value_counts()
+     
+count
+Position	
+2	213
+1	204
+3	197
+0	186
+
+dtype: int64
+
+# 0   goalkeeper
+# 1   defender
+# 2   midfielder
+# 3   forward
+     
+
+df['Position'].unique()
+
+     
+array([2, 3, 1, 0])
+
+df.head()
+     
+Age	Height_cm	Weight_kg	Position	Training_Hours_Per_Week	Matches_Played_Past_Season	Previous_Injury_Count	Knee_Strength_Score	Balance_Test_Score	Agility_Score	Sleep_Hours_Per_Night	Stress_Level_Score	Nutrition_Quality_Score	Warmup_Routine_Adherence	Injury_Next_Season	BMI
+0	22	173	64	2	11.575308	36	1	77.460279	91.212476	77.599705	8.238293	46.616415	81.472206	1	0	21.383942
+1	18	170	67	2	12.275869	37	2	72.634442	87.294078	94.418987	8.983737	49.368037	81.056677	1	0	23.183391
+2	22	186	75	3	12.254896	12	2	77.064490	83.440688	70.179176	7.229193	43.132808	64.877457	0	1	21.678807
+3	20	172	62	1	9.006678	11	1	82.810232	87.591894	83.473824	7.681029	51.528529	89.824744	1	0	20.957274
+4	18	172	94	2	12.683668	10	2	76.772859	83.125161	87.037256	6.728091	52.379718	71.569197	0	1	31.773932
+
+df.info()
+     
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 800 entries, 0 to 799
+Data columns (total 16 columns):
+ #   Column                      Non-Null Count  Dtype  
+---  ------                      --------------  -----  
+ 0   Age                         800 non-null    int64  
+ 1   Height_cm                   800 non-null    int64  
+ 2   Weight_kg                   800 non-null    int64  
+ 3   Position                    800 non-null    int64  
+ 4   Training_Hours_Per_Week     800 non-null    float64
+ 5   Matches_Played_Past_Season  800 non-null    int64  
+ 6   Previous_Injury_Count       800 non-null    int64  
+ 7   Knee_Strength_Score         800 non-null    float64
+ 8   Balance_Test_Score          800 non-null    float64
+ 9   Agility_Score               800 non-null    float64
+ 10  Sleep_Hours_Per_Night       800 non-null    float64
+ 11  Stress_Level_Score          800 non-null    float64
+ 12  Nutrition_Quality_Score     800 non-null    float64
+ 13  Warmup_Routine_Adherence    800 non-null    int64  
+ 14  Injury_Next_Season          800 non-null    int64  
+ 15  BMI                         800 non-null    float64
+dtypes: float64(8), int64(8)
+memory usage: 100.1 KB
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score, jaccard_score
+     
+
+x = df.drop('Injury_Next_Season', axis=1)    # feature
+y = df['Injury_Next_Season']                   # target
+     
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25)
+# 75% feature,25% feature,75% target, 25% target
+     
+
+sc = StandardScaler()
+x_train = sc.fit_transform(x_train)
+x_test = sc.transform(x_test)
+# malumot feature da kop so feature ni zip qilamz
+
+     
+
+classifier = KNeighborsClassifier(n_neighbors=21)
+classifier.fit(x_train, y_train)
+# feature ni 75 % va target ni 75 % bn train qildik yani o'qitdik  yani javobi bn yaxshiro
+     
+KNeighborsClassifier(n_neighbors=21)
+In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook.
+On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.
+
+prediction = classifier.predict(x_test)
+# botta modelga o'qitdik va unga test berib tekshiramz qanchali ishlarkan x test yani 25% feature ni yani bilmagan infolar bn to check qilamz
+     
+
+print('Percentage:', accuracy_score(y_test, prediction) * 100)
+# modelimizni imtixon qildm va uni javobini tekshirish uchun o'zimda bor to'ri javobla bn tekshiraman to'ri notoriligini yani y test da targetni 25 % bor oshan bn tekshiranan
+     
+Percentage: 89.0
+
+print(confusion_matrix(y_test, prediction))
+     
+[[80 12]
+ [10 98]]
+
+import matplotlib.pyplot as plt
+f1 = []
+for k in range(1, 25):
+  classifier = KNeighborsClassifier(n_neighbors=k)
+  classifier.fit(x_train, y_train)
+  prediction = classifier.predict(x_test)
+  f1.append(f1_score(y_test, prediction))
+
+
+plt.figure(figsize=(10, 6))
+plt.title('it is made by Xasan')
+plt.plot(range(1, 25), f1)
+plt.xticks(range(1, 25))
+plt.grid()
+plt.show()
+
+     
+
+
+print('precision:', precision_score(y_test, prediction))
+print('recall:', recall_score(y_test, prediction))
+print('f1 score:', f1_score(y_test, prediction))
+     
+precision: 0.8807339449541285
+recall: 0.8888888888888888
+f1 score: 0.8847926267281107
+
+print('jaccard score:', jaccard_score(y_test, prediction))
+     
+jaccard score: 0.7933884297520661
+
+
+     
