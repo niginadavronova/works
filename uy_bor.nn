@@ -1,0 +1,687 @@
+
+import pandas as pd 
+df = pd.read_csv('ustudy_uy_bor.csv')
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 518 entries, 0 to 517
+Data columns (total 23 columns):
+ #   Column              Non-Null Count  Dtype 
+---  ------              --------------  ----- 
+ 0   Title               518 non-null    object
+ 1   Square              518 non-null    int64 
+ 2   Price               518 non-null    int64 
+ 3   Room                518 non-null    int64 
+ 4   Floor               518 non-null    int64 
+ 5   Building floor      518 non-null    int64 
+ 6   Renovation          518 non-null    object
+ 7   Material            518 non-null    object
+ 8   Address             518 non-null    object
+ 9   Lift                518 non-null    int64 
+ 10  Bathroom            518 non-null    int64 
+ 11  Washing machine     518 non-null    int64 
+ 12  TV                  518 non-null    int64 
+ 13  Microwave oven      518 non-null    int64 
+ 14  Playground          518 non-null    int64 
+ 15  Furniture           518 non-null    int64 
+ 16  Refrigerator        518 non-null    int64 
+ 17  Air conditioner     518 non-null    int64 
+ 18  Wifi                518 non-null    int64 
+ 19  Cable               518 non-null    int64 
+ 20  Security            518 non-null    int64 
+ 21  Video surveillance  518 non-null    int64 
+ 22  Parking space       518 non-null    int64 
+dtypes: int64(19), object(4)
+memory usage: 93.2+ KB
+# df['Unnamed: 0.1'].value_counts()
+# df['Unnamed: 0'].value_counts()
+# df.drop(['Unnamed: 0', 'Unnamed: 0.1'], axis = 1, inplace = True)
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 518 entries, 0 to 517
+Data columns (total 23 columns):
+ #   Column              Non-Null Count  Dtype 
+---  ------              --------------  ----- 
+ 0   Title               518 non-null    object
+ 1   Square              518 non-null    int64 
+ 2   Price               518 non-null    int64 
+ 3   Room                518 non-null    int64 
+ 4   Floor               518 non-null    int64 
+ 5   Building floor      518 non-null    int64 
+ 6   Renovation          518 non-null    object
+ 7   Material            518 non-null    object
+ 8   Address             518 non-null    object
+ 9   Lift                518 non-null    int64 
+ 10  Bathroom            518 non-null    int64 
+ 11  Washing machine     518 non-null    int64 
+ 12  TV                  518 non-null    int64 
+ 13  Microwave oven      518 non-null    int64 
+ 14  Playground          518 non-null    int64 
+ 15  Furniture           518 non-null    int64 
+ 16  Refrigerator        518 non-null    int64 
+ 17  Air conditioner     518 non-null    int64 
+ 18  Wifi                518 non-null    int64 
+ 19  Cable               518 non-null    int64 
+ 20  Security            518 non-null    int64 
+ 21  Video surveillance  518 non-null    int64 
+ 22  Parking space       518 non-null    int64 
+dtypes: int64(19), object(4)
+memory usage: 93.2+ KB
+df.head()
+Title	Square	Price	Room	Floor	Building floor	Renovation	Material	Address	Lift	...	Microwave oven	Playground	Furniture	Refrigerator	Air conditioner	Wifi	Cable	Security	Video surveillance	Parking space
+0	2-комнатная квартира на продажу	60	61000	2	2	9	Требует ремонта	Панельный	город Ташкент, Яшнободский район, махаллинский...	1	...	0	0	0	0	0	0	0	0	0	0
+1	4-комнатная квартира на продажу	95	80000	4	5	9	Евроремонт	Панельный	город Ташкент, Сергелийский район, махаллински...	1	...	0	1	1	0	1	1	1	0	0	1
+2	1-комнатная квартира на продажу	37	55000	1	8	9	Евроремонт	Другое	город Ташкент, Яшнободский район, жилой компле...	1	...	0	1	1	1	0	1	1	1	1	1
+3	1-комнатная квартира на продажу	37	66000	1	2	5	Евроремонт	Кирпичный	город Ташкент, Чиланзарский район, квартал Е, ...	0	...	0	0	0	0	0	0	0	0	0	0
+4	4-комнатная квартира на продажу	127	206000	4	2	5	Средний	Кирпичный	город Ташкент, Яшнободский район, махаллинский...	0	...	0	0	0	0	0	0	0	0	0	0
+5 rows × 23 columns
+
+def clean_square(value):
+  result = str(value)
+  result = result.split()[0]
+  return int(float(result))
+
+df['Square'] = df['Square'].apply(clean_square)
+df['Square'].value_counts()
+Square
+50     30
+60     27
+30     17
+65     15
+90     14
+       ..
+2       1
+265     1
+21      1
+158     1
+146     1
+Name: count, Length: 115, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 518 entries, 0 to 517
+Data columns (total 23 columns):
+ #   Column              Non-Null Count  Dtype 
+---  ------              --------------  ----- 
+ 0   Title               518 non-null    object
+ 1   Square              518 non-null    int64 
+ 2   Price               518 non-null    int64 
+ 3   Room                518 non-null    int64 
+ 4   Floor               518 non-null    int64 
+ 5   Building floor      518 non-null    int64 
+ 6   Renovation          518 non-null    object
+ 7   Material            518 non-null    object
+ 8   Address             518 non-null    object
+ 9   Lift                518 non-null    int64 
+ 10  Bathroom            518 non-null    int64 
+ 11  Washing machine     518 non-null    int64 
+ 12  TV                  518 non-null    int64 
+ 13  Microwave oven      518 non-null    int64 
+ 14  Playground          518 non-null    int64 
+ 15  Furniture           518 non-null    int64 
+ 16  Refrigerator        518 non-null    int64 
+ 17  Air conditioner     518 non-null    int64 
+ 18  Wifi                518 non-null    int64 
+ 19  Cable               518 non-null    int64 
+ 20  Security            518 non-null    int64 
+ 21  Video surveillance  518 non-null    int64 
+ 22  Parking space       518 non-null    int64 
+dtypes: int64(19), object(4)
+memory usage: 93.2+ KB
+df['Price'].value_counts()
+Price
+75000     17
+85000     16
+80000     14
+120000    11
+105000    11
+          ..
+76500      1
+24500      1
+195555     1
+74500      1
+83500      1
+Name: count, Length: 214, dtype: int64
+df.head()
+Title	Square	Price	Room	Floor	Building floor	Renovation	Material	Address	Lift	...	Microwave oven	Playground	Furniture	Refrigerator	Air conditioner	Wifi	Cable	Security	Video surveillance	Parking space
+0	2-комнатная квартира на продажу	60	61000	2	2	9	Требует ремонта	Панельный	город Ташкент, Яшнободский район, махаллинский...	1	...	0	0	0	0	0	0	0	0	0	0
+1	4-комнатная квартира на продажу	95	80000	4	5	9	Евроремонт	Панельный	город Ташкент, Сергелийский район, махаллински...	1	...	0	1	1	0	1	1	1	0	0	1
+2	1-комнатная квартира на продажу	37	55000	1	8	9	Евроремонт	Другое	город Ташкент, Яшнободский район, жилой компле...	1	...	0	1	1	1	0	1	1	1	1	1
+3	1-комнатная квартира на продажу	37	66000	1	2	5	Евроремонт	Кирпичный	город Ташкент, Чиланзарский район, квартал Е, ...	0	...	0	0	0	0	0	0	0	0	0	0
+4	4-комнатная квартира на продажу	127	206000	4	2	5	Средний	Кирпичный	город Ташкент, Яшнободский район, махаллинский...	0	...	0	0	0	0	0	0	0	0	0	0
+5 rows × 23 columns
+
+def clean_price(value):
+  result = str(value)
+  result = result.replace(' ', '')
+  result = str(result).split('у')[0]
+  return int(float(result))
+
+df['Price'] = df['Price'].apply(clean_price)
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 518 entries, 0 to 517
+Data columns (total 23 columns):
+ #   Column              Non-Null Count  Dtype 
+---  ------              --------------  ----- 
+ 0   Title               518 non-null    object
+ 1   Square              518 non-null    int64 
+ 2   Price               518 non-null    int64 
+ 3   Room                518 non-null    int64 
+ 4   Floor               518 non-null    int64 
+ 5   Building floor      518 non-null    int64 
+ 6   Renovation          518 non-null    object
+ 7   Material            518 non-null    object
+ 8   Address             518 non-null    object
+ 9   Lift                518 non-null    int64 
+ 10  Bathroom            518 non-null    int64 
+ 11  Washing machine     518 non-null    int64 
+ 12  TV                  518 non-null    int64 
+ 13  Microwave oven      518 non-null    int64 
+ 14  Playground          518 non-null    int64 
+ 15  Furniture           518 non-null    int64 
+ 16  Refrigerator        518 non-null    int64 
+ 17  Air conditioner     518 non-null    int64 
+ 18  Wifi                518 non-null    int64 
+ 19  Cable               518 non-null    int64 
+ 20  Security            518 non-null    int64 
+ 21  Video surveillance  518 non-null    int64 
+ 22  Parking space       518 non-null    int64 
+dtypes: int64(19), object(4)
+memory usage: 93.2+ KB
+df['Price'].value_counts()
+Price
+75000     17
+85000     16
+80000     14
+120000    11
+105000    11
+          ..
+76500      1
+24500      1
+195555     1
+74500      1
+83500      1
+Name: count, Length: 214, dtype: int64
+df['Room'].value_counts()
+Room
+2    186
+3    139
+1     96
+4     78
+5     17
+6      2
+Name: count, dtype: int64
+import numpy as np
+
+def clean_room(value):
+    # Handle NaN
+    if pd.isna(value):
+        return np.nan
+
+    # Convert to string
+    result = str(value).strip()
+
+    # Remove '+' if exists
+    if '+' in result:
+        result = result.replace('+', '')
+
+    # TRY to convert to number, if it fails return NaN
+    try:
+        return int(float(result))
+    except (ValueError, TypeError):
+        return np.nan  # ← This is what was missing!
+
+# Apply
+df['Room'] = df['Room'].apply(clean_room)
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 518 entries, 0 to 517
+Data columns (total 23 columns):
+ #   Column              Non-Null Count  Dtype 
+---  ------              --------------  ----- 
+ 0   Title               518 non-null    object
+ 1   Square              518 non-null    int64 
+ 2   Price               518 non-null    int64 
+ 3   Room                518 non-null    int64 
+ 4   Floor               518 non-null    int64 
+ 5   Building floor      518 non-null    int64 
+ 6   Renovation          518 non-null    object
+ 7   Material            518 non-null    object
+ 8   Address             518 non-null    object
+ 9   Lift                518 non-null    int64 
+ 10  Bathroom            518 non-null    int64 
+ 11  Washing machine     518 non-null    int64 
+ 12  TV                  518 non-null    int64 
+ 13  Microwave oven      518 non-null    int64 
+ 14  Playground          518 non-null    int64 
+ 15  Furniture           518 non-null    int64 
+ 16  Refrigerator        518 non-null    int64 
+ 17  Air conditioner     518 non-null    int64 
+ 18  Wifi                518 non-null    int64 
+ 19  Cable               518 non-null    int64 
+ 20  Security            518 non-null    int64 
+ 21  Video surveillance  518 non-null    int64 
+ 22  Parking space       518 non-null    int64 
+dtypes: int64(19), object(4)
+memory usage: 93.2+ KB
+df['Room'].value_counts()
+Room
+2    186
+3    139
+1     96
+4     78
+5     17
+6      2
+Name: count, dtype: int64
+df['Room'].value_counts()
+Room
+2    186
+3    139
+1     96
+4     78
+5     17
+6      2
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 518 entries, 0 to 517
+Data columns (total 23 columns):
+ #   Column              Non-Null Count  Dtype 
+---  ------              --------------  ----- 
+ 0   Title               518 non-null    object
+ 1   Square              518 non-null    int64 
+ 2   Price               518 non-null    int64 
+ 3   Room                518 non-null    int64 
+ 4   Floor               518 non-null    int64 
+ 5   Building floor      518 non-null    int64 
+ 6   Renovation          518 non-null    object
+ 7   Material            518 non-null    object
+ 8   Address             518 non-null    object
+ 9   Lift                518 non-null    int64 
+ 10  Bathroom            518 non-null    int64 
+ 11  Washing machine     518 non-null    int64 
+ 12  TV                  518 non-null    int64 
+ 13  Microwave oven      518 non-null    int64 
+ 14  Playground          518 non-null    int64 
+ 15  Furniture           518 non-null    int64 
+ 16  Refrigerator        518 non-null    int64 
+ 17  Air conditioner     518 non-null    int64 
+ 18  Wifi                518 non-null    int64 
+ 19  Cable               518 non-null    int64 
+ 20  Security            518 non-null    int64 
+ 21  Video surveillance  518 non-null    int64 
+ 22  Parking space       518 non-null    int64 
+dtypes: int64(19), object(4)
+memory usage: 93.2+ KB
+df.head()
+Title	Square	Price	Room	Floor	Building floor	Renovation	Material	Address	Lift	...	Microwave oven	Playground	Furniture	Refrigerator	Air conditioner	Wifi	Cable	Security	Video surveillance	Parking space
+0	2-комнатная квартира на продажу	60	61000	2	2	9	Требует ремонта	Панельный	город Ташкент, Яшнободский район, махаллинский...	1	...	0	0	0	0	0	0	0	0	0	0
+1	4-комнатная квартира на продажу	95	80000	4	5	9	Евроремонт	Панельный	город Ташкент, Сергелийский район, махаллински...	1	...	0	1	1	0	1	1	1	0	0	1
+2	1-комнатная квартира на продажу	37	55000	1	8	9	Евроремонт	Другое	город Ташкент, Яшнободский район, жилой компле...	1	...	0	1	1	1	0	1	1	1	1	1
+3	1-комнатная квартира на продажу	37	66000	1	2	5	Евроремонт	Кирпичный	город Ташкент, Чиланзарский район, квартал Е, ...	0	...	0	0	0	0	0	0	0	0	0	0
+4	4-комнатная квартира на продажу	127	206000	4	2	5	Средний	Кирпичный	город Ташкент, Яшнободский район, махаллинский...	0	...	0	0	0	0	0	0	0	0	0	0
+5 rows × 23 columns
+
+# title
+# renovation
+# material
+# adres
+df['Material'].value_counts()
+Material
+Кирпичный      259
+Панельный      167
+Монолитный      44
+Другое          30
+Блочный         16
+No material      2
+Name: count, dtype: int64
+df['Renovation'].value_counts()
+Renovation
+Евроремонт          204
+Средний             183
+Требует ремонта      56
+Авторский проект     49
+Черновая отделка     25
+No renovation         1
+Name: count, dtype: int64
+df['Address'].value_counts()
+Address
+город Ташкент, Яшнободский район, махаллинский сход граждан Истиклол                    1
+город Ташкент, Яшнободский район, массив Авиагородок-22                                 1
+город Ташкент, Чиланзарский район, махалля Чилонзор, улица Мукими                       1
+Ташкентская область, махаллинский сход граждан Гулистон, улица Миробод                  1
+город Ташкент, Яшнободский район, махаллинский сход граждан Маърифат, улица Эльбека     1
+                                                                                       ..
+город Ташкент, Шайхантахурский район, махаллинский сход граждан Шайхонтохур             1
+город Ташкент, Яшнободский район, махаллинский сход граждан Алимкент, улица Кадышева    1
+город Ташкент, Мирзо-Улугбекский район, 3-й квартал                                     1
+Бухарская область, Бухара                                                               1
+город Ташкент, Мирабадский район, махаллинский сход граждан Фуркат, улица Янгизамон     1
+Name: count, Length: 518, dtype: int64
+df['Lift'].value_counts()
+Lift
+0    323
+1    195
+Name: count, dtype: int64
+df['Price'].value_counts()
+Price
+75000     17
+85000     16
+80000     14
+120000    11
+105000    11
+          ..
+76500      1
+24500      1
+195555     1
+74500      1
+83500      1
+Name: count, Length: 214, dtype: int64
+df['Bathroom'].value_counts()
+Bathroom
+0    397
+1    121
+Name: count, dtype: int64
+df['Washing machine'].value_counts()
+Washing machine
+0    408
+1    110
+Name: count, dtype: int64
+df['TV'].value_counts()
+TV
+0    410
+1    108
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 518 entries, 0 to 517
+Data columns (total 23 columns):
+ #   Column              Non-Null Count  Dtype 
+---  ------              --------------  ----- 
+ 0   Title               518 non-null    object
+ 1   Square              518 non-null    int64 
+ 2   Price               518 non-null    int64 
+ 3   Room                518 non-null    int64 
+ 4   Floor               518 non-null    int64 
+ 5   Building floor      518 non-null    int64 
+ 6   Renovation          518 non-null    object
+ 7   Material            518 non-null    object
+ 8   Address             518 non-null    object
+ 9   Lift                518 non-null    int64 
+ 10  Bathroom            518 non-null    int64 
+ 11  Washing machine     518 non-null    int64 
+ 12  TV                  518 non-null    int64 
+ 13  Microwave oven      518 non-null    int64 
+ 14  Playground          518 non-null    int64 
+ 15  Furniture           518 non-null    int64 
+ 16  Refrigerator        518 non-null    int64 
+ 17  Air conditioner     518 non-null    int64 
+ 18  Wifi                518 non-null    int64 
+ 19  Cable               518 non-null    int64 
+ 20  Security            518 non-null    int64 
+ 21  Video surveillance  518 non-null    int64 
+ 22  Parking space       518 non-null    int64 
+dtypes: int64(19), object(4)
+memory usage: 93.2+ KB
+# df.to_csv('ustudy_uy_bor.csv', index = False)
+# from google.colab import files
+# files.download('ustudy_uy_bor.csv')
+! pip install torch
+Requirement already satisfied: torch in c:\users\fatih\anaconda3\lib\site-packages (2.9.1)
+Requirement already satisfied: filelock in c:\users\fatih\anaconda3\lib\site-packages (from torch) (3.17.0)
+Requirement already satisfied: typing-extensions>=4.10.0 in c:\users\fatih\anaconda3\lib\site-packages (from torch) (4.12.2)
+Requirement already satisfied: sympy>=1.13.3 in c:\users\fatih\anaconda3\lib\site-packages (from torch) (1.13.3)
+Requirement already satisfied: networkx>=2.5.1 in c:\users\fatih\anaconda3\lib\site-packages (from torch) (3.4.2)
+Requirement already satisfied: jinja2 in c:\users\fatih\anaconda3\lib\site-packages (from torch) (3.1.6)
+Requirement already satisfied: fsspec>=0.8.5 in c:\users\fatih\anaconda3\lib\site-packages (from torch) (2025.3.2)
+Requirement already satisfied: setuptools in c:\users\fatih\anaconda3\lib\site-packages (from torch) (80.9.0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in c:\users\fatih\anaconda3\lib\site-packages (from sympy>=1.13.3->torch) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in c:\users\fatih\anaconda3\lib\site-packages (from jinja2->torch) (3.0.2)
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.metrics import mean_squared_error, mean_absolute_error, root_mean_squared_error
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+import joblib
+x = df.drop('Price', axis = 1)  # feature
+y = df['Price']                 # target
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 42)
+sc = StandardScaler()
+oe = OneHotEncoder(handle_unknown='ignore')
+numerical_feat = x_train.select_dtypes(include = ['float', 'int']).columns
+cat_feat = x_train.select_dtypes(include = 'object').columns
+df.drop('Title', axis = 1, inplace = True)
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 518 entries, 0 to 517
+Data columns (total 22 columns):
+ #   Column              Non-Null Count  Dtype 
+---  ------              --------------  ----- 
+ 0   Square              518 non-null    int64 
+ 1   Price               518 non-null    int64 
+ 2   Room                518 non-null    int64 
+ 3   Floor               518 non-null    int64 
+ 4   Building floor      518 non-null    int64 
+ 5   Renovation          518 non-null    object
+ 6   Material            518 non-null    object
+ 7   Address             518 non-null    object
+ 8   Lift                518 non-null    int64 
+ 9   Bathroom            518 non-null    int64 
+ 10  Washing machine     518 non-null    int64 
+ 11  TV                  518 non-null    int64 
+ 12  Microwave oven      518 non-null    int64 
+ 13  Playground          518 non-null    int64 
+ 14  Furniture           518 non-null    int64 
+ 15  Refrigerator        518 non-null    int64 
+ 16  Air conditioner     518 non-null    int64 
+ 17  Wifi                518 non-null    int64 
+ 18  Cable               518 non-null    int64 
+ 19  Security            518 non-null    int64 
+ 20  Video surveillance  518 non-null    int64 
+ 21  Parking space       518 non-null    int64 
+dtypes: int64(19), object(3)
+memory usage: 89.2+ KB
+num_transformer = Pipeline(
+    steps = [
+        ('imputer', SimpleImputer(strategy = 'mean')),
+        ('scaler', sc)
+    ]
+)
+
+cat_transformer = Pipeline(
+    steps = [
+        ('imputer', SimpleImputer(strategy = 'most_frequent')),
+        ('scaler', oe)
+    ]
+)
+preprocessor = ColumnTransformer(
+    transformers = [
+                    ('num', num_transformer, numerical_feat),
+                     ('cat', cat_transformer, cat_feat)
+    ]
+)
+x_train_preprocessed = preprocessor.fit_transform(x_train)
+y_train_preprocessed = np.log1p(y_train)
+x_test_preprocessed = preprocessor.transform(x_test)
+y_test_preprocessed = np.log1p(y_test.values)
+# # x_train bn x_test data frame edi bulani array qilish kere asanyarray bn
+x_train_preprocessed = np.asanyarray(x_train_preprocessed)
+x_test_preprocessed = np.asanyarray(x_test_preprocessed)
+# x_train_tensor = torch.FloatTensor(x_train_preprocessed.toarray())
+# x_test_tensor = torch.FloatTensor(x_test_preprocessed.toarray())
+# y_train_tensor = torch.FloatTensor(y_train_preprocessed).reshape(-1, 1)
+# y_test_tensor = torch.FloatTensor(y_test_preprocessed).reshape(-1,1)
+# print("\n✅ Tensors created from PREPROCESSED data!")
+# print(f"x_train_tensor: {x_train_tensor.shape}")
+# print(f"x_test_tensor: {x_test_tensor.shape}")
+# print(f"y_train_tensor: {y_train_tensor.shape}")
+# print(f"y_test_tensor: {y_test_tensor.shape}")
+import numpy as np
+import torch
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.impute import SimpleImputer
+
+# 1. Identify column types
+numerical_feat = x_train.select_dtypes(include=['float', 'int']).columns
+cat_feat = x_train.select_dtypes(include='object').columns
+
+print(f"Numerical features: {list(numerical_feat)}")
+print(f"Categorical features: {list(cat_feat)}")
+
+# 2. Create transformers
+sc = StandardScaler()
+oe = OneHotEncoder(drop='first', sparse_output=False, handle_unknown='ignore')
+
+num_transformer = Pipeline(
+    steps=[
+        ('imputer', SimpleImputer(strategy='mean')),
+        ('scaler', sc)
+    ]
+)
+
+cat_transformer = Pipeline(
+    steps=[
+        ('imputer', SimpleImputer(strategy='most_frequent')),
+        ('encoder', oe)  # ← Changed 'scaler' to 'encoder' (more clear)
+    ]
+)
+
+# 3. Create preprocessor
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', num_transformer, numerical_feat),
+        ('cat', cat_transformer, cat_feat)
+    ]
+)
+
+# 4. Fit and transform training data
+x_train_preprocessed = preprocessor.fit_transform(x_train)  # ← Use fit_transform
+y_train_preprocessed = np.log1p(y_train.values)  # ← Add .values for consistency
+
+# 5. Transform test data (use transform, NOT fit_transform!)
+x_test_preprocessed = preprocessor.transform(x_test)  # ← Only transform!
+y_test_preprocessed = np.log1p(y_test.values)
+
+# 6. Convert to PyTorch tensors (use PREPROCESSED data!)
+x_train_tensor = torch.FloatTensor(x_train_preprocessed)  # ← Fixed!
+x_test_tensor = torch.FloatTensor(x_test_preprocessed)    # ← Fixed!
+y_train_tensor = torch.FloatTensor(y_train_preprocessed).reshape(-1, 1)
+y_test_tensor = torch.FloatTensor(y_test_preprocessed).reshape(-1, 1)
+
+print("\n✅ Tensors created from PREPROCESSED data!")
+print(f"x_train_tensor: {x_train_tensor.shape}")
+print(f"x_test_tensor: {x_test_tensor.shape}")
+print(f"y_train_tensor: {y_train_tensor.shape}")
+print(f"y_test_tensor: {y_test_tensor.shape}")
+Numerical features: ['Square', 'Room', 'Floor', 'Building floor', 'Lift', 'Bathroom', 'Washing machine', 'TV', 'Microwave oven', 'Playground', 'Furniture', 'Refrigerator', 'Air conditioner', 'Wifi', 'Cable', 'Security', 'Video surveillance', 'Parking space']
+Categorical features: ['Title', 'Renovation', 'Material', 'Address']
+
+✅ Tensors created from PREPROCESSED data!
+x_train_tensor: torch.Size([414, 446])
+x_test_tensor: torch.Size([104, 446])
+y_train_tensor: torch.Size([414, 1])
+y_test_tensor: torch.Size([104, 1])
+C:\Users\Fatih\anaconda3\Lib\site-packages\sklearn\preprocessing\_encoders.py:246: UserWarning: Found unknown categories in columns [3] during transform. These unknown categories will be encoded as all zeros
+  warnings.warn(
+class HomePrices(nn.Module):
+    def __init__(self, input_size):
+        super().__init__()
+        self.layer1 = nn.Linear(input_size, 32)
+        self.layer2 = nn.Linear(32, 16)
+        self.layer3 = nn.Linear(16, 8)
+        self.layer4 = nn.Linear(8, 4)
+        self.layer5 = nn.Linear(4, 2)
+        self.layer6 = nn.Linear(2, 1)
+        self.dropout = nn.Dropout(0.2)
+
+    def forward(self, x):
+        x = torch.relu(self.layer1(x))
+        x = self.dropout(x)
+        x = torch.relu(self.layer2(x))
+        x = self.dropout(x)
+        x = torch.relu(self.layer3(x))
+        x = self.dropout(x)
+        x = torch.relu(self.layer4(x))
+        x = self.dropout(x)
+        x = torch.relu(self.layer5(x))
+        x = self.dropout(x)
+        x = self.layer6(x)
+
+        return x
+input_size = x_train_tensor.shape[1]
+# print(input_size)
+model = HomePrices(input_size)
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=0.0001)
+num_epoch = 200
+batch_size = 64
+train_loss = []
+test_losses = []
+for i in range(num_epoch):
+    model.train()
+    epoch_loss = 0
+
+    for j in range(0, len(x_train_tensor), batch_size):
+        batch_x = x_train_tensor[j:j+batch_size]
+        batch_y = y_train_tensor[j:j+batch_size]
+
+        outputs = model(batch_x)
+        loss = criterion(outputs, batch_y)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        epoch_loss += loss.item()
+
+    avg_train_loss = epoch_loss / (len(x_train_tensor) / batch_size)
+
+    with torch.no_grad():
+        test_outputs = model(x_test_tensor)
+        test_loss = criterion(test_outputs, y_test_tensor)
+        test_losses.append(test_loss.item())
+
+    if (i + 1) % 20 == 0:
+        print(f"Epoch: {i+1}/{num_epoch} Train Loss: {avg_train_loss} Test Loss: {test_loss.item()}")
+
+model.eval()
+with torch.no_grad():
+    train_outputs = model(x_train_tensor)
+    train_loss = criterion(train_outputs, y_train_tensor)
+    train_mse = mean_squared_error(y_train_tensor, train_outputs)
+    rmse = np.sqrt(train_mse)
+
+    test_outputs = model(x_test_tensor)
+    test_loss = criterion(test_outputs, y_test_tensor)
+    test_mse = mean_squared_error(y_test_tensor, test_outputs)
+    test_rmse = np.sqrt(test_mse)
+
+print("Training Loss: ", train_loss.item())
+print("Training MSE: ", train_mse)
+print("Training RMSE: ", rmse)
+print("Test Loss: ", test_loss.item())
+print("Test MSE: ", test_mse)
+print("Test RMSE: ", test_rmse)
+Epoch: 20/200 Train Loss: 127.39120055857488 Test Loss: 117.43721008300781
+Epoch: 40/200 Train Loss: 126.70003962862319 Test Loss: 116.81892395019531
+Epoch: 60/200 Train Loss: 125.90338518078201 Test Loss: 116.07625579833984
+Epoch: 80/200 Train Loss: 125.27253642059179 Test Loss: 115.32676696777344
+Epoch: 100/200 Train Loss: 124.5509876490791 Test Loss: 114.79443359375
+Epoch: 120/200 Train Loss: 123.78310877113526 Test Loss: 113.78993225097656
+Epoch: 140/200 Train Loss: 119.6746891040157 Test Loss: 110.49267578125
+Epoch: 160/200 Train Loss: 94.13718816047705 Test Loss: 88.88333892822266
+Epoch: 180/200 Train Loss: 63.75806076860658 Test Loss: 58.54767608642578
+Epoch: 200/200 Train Loss: 49.589512921761774 Test Loss: 42.88542938232422
+Training Loss:  23.659908294677734
+Training MSE:  23.659907994720704
+Training RMSE:  4.864145145318004
+Test Loss:  24.404245376586914
+Test MSE:  24.404244185945608
+Test RMSE:  4.940065200576366
+ 
