@@ -1,0 +1,2149 @@
+
+import pandas as pd 
+import numpy as np 
+df = pd.read_csv('amazon_laptops_latest_version.csv')
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype 
+---  ------                     --------------  ----- 
+ 0   Unnamed: 0                 220 non-null    int64 
+ 1   brand                      220 non-null    object
+ 2   model_name                 219 non-null    object
+ 3   screen_size(inches)        220 non-null    object
+ 4   price(₹)                   220 non-null    object
+ 5   ram                        205 non-null    object
+ 6   storage                    220 non-null    object
+ 7   cpu_model                  219 non-null    object
+ 8   operating_system           220 non-null    object
+ 9   rating                     220 non-null    object
+ 10  rating_review              220 non-null    object
+ 11  graphics_card_description  220 non-null    object
+dtypes: int64(1), object(11)
+memory usage: 20.8+ KB
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	39.6 Centimetres	48,990	16 GB	512 GB	Core i5	Windows 11 Home	no rating	457 ratings	Integrated
+1	1	acer	Aspire Lite	15.6 Inches	39,990	16 GB	512 GB	Core i5-12450H	Windows 11 Home	no rating	547 ratings	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.6 Inches	41,990	8 GB	512 GB	Ryzen 7	Windows 11 Home	no rating	43 ratings	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.6 Inches	61,990	16 GB	no storage	AMD Ryzen 7	Windows 11 Home	no rating	487 ratings	Dedicated
+4	4	Lenovo	Lenovo 14	14 Inches	47,990	24 GB	512 GB	Core i5-1235U	Windows 11 Pro	no rating	no rating_review	Integrated
+df['screen_size(inches)'].value_counts()
+screen_size(inches)
+15.6 Inches         77
+no screen_size      41
+39.6 Centimetres    24
+14 Inches           21
+13.6 Inches         15
+16 Inches           13
+15 Inches            4
+14.1 Inches          4
+15.6                 4
+40.6 Centimetres     3
+15.3                 2
+11.6 Inches          2
+17.3 Inches          1
+35.6 Centimetres     1
+11.5 Inches          1
+40.9 Centimetres     1
+15.3 Inches          1
+44 Centimetres       1
+40 Centimetres       1
+41 Centimetres       1
+13.8 Inches          1
+13.3 Inches          1
+Name: count, dtype: int64
+#inches=centimeters÷2.54
+def screen_size_clean(value):
+    result = str(value)
+    result = result.replace('no screen_size', '1')
+    if 'Centimetres' in result:
+        number = result.split()[0]
+        inch = float(number) / 2.54
+        return inch
+    elif 'Inches' in result:
+        number = float(result.split()[0])
+        return number
+        
+
+
+
+df['screen_size(inches)'] = df['screen_size(inches)'].apply(screen_size_clean)
+avg = df['screen_size(inches)'].mean()
+df['screen_size(inches)'] = df['screen_size(inches)'].fillna(avg)
+
+
+    
+df['screen_size(inches)'].value_counts()
+screen_size(inches)
+15.600000    77
+15.141368    47
+15.590551    24
+14.000000    21
+13.600000    15
+16.000000    13
+15.000000     4
+14.100000     4
+15.984252     3
+11.600000     2
+17.300000     1
+14.015748     1
+16.102362     1
+11.500000     1
+17.322835     1
+15.300000     1
+15.748031     1
+16.141732     1
+13.800000     1
+13.300000     1
+Name: count, dtype: int64
+ 
+df['screen_size(inches)'] = df['screen_size(inches)'].round(2)
+df['screen_size(inches)'].value_counts()
+screen_size(inches)
+15.60    77
+15.14    47
+15.59    24
+14.00    21
+13.60    15
+16.00    13
+15.00     4
+14.10     4
+15.98     3
+11.60     2
+17.30     1
+14.02     1
+16.10     1
+11.50     1
+17.32     1
+15.30     1
+15.75     1
+16.14     1
+13.80     1
+13.30     1
+Name: count, dtype: int64
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48,990	16 GB	512 GB	Core i5	Windows 11 Home	no rating	457 ratings	Integrated
+1	1	acer	Aspire Lite	15.60	39,990	16 GB	512 GB	Core i5-12450H	Windows 11 Home	no rating	547 ratings	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41,990	8 GB	512 GB	Ryzen 7	Windows 11 Home	no rating	43 ratings	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61,990	16 GB	no storage	AMD Ryzen 7	Windows 11 Home	no rating	487 ratings	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47,990	24 GB	512 GB	Core i5-1235U	Windows 11 Pro	no rating	no rating_review	Integrated
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    object 
+ 5   ram                        205 non-null    object 
+ 6   storage                    220 non-null    object 
+ 7   cpu_model                  219 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    object 
+ 10  rating_review              220 non-null    object 
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(1), int64(1), object(10)
+memory usage: 20.8+ KB
+df['price(₹)'].value_counts()
+price(₹)
+48,990    11
+39,990    10
+40,490     9
+59,990     8
+92,990     7
+          ..
+245        1
+328        1
+899        1
+499        1
+309        1
+Name: count, Length: 122, dtype: int64
+def price_clean(value):
+    result = str(value)
+    result = result.lower().strip()
+    if 'no price' in result or result == 'nan' or result == 'none' or result == '':
+        return np.nan
+    if 'no price' in result:
+        return np.nan
+    if ',' in result:
+        result = result.replace(',', '')
+    return float(result)
+
+
+
+
+df['price(₹)'] = df['price(₹)'].apply(price_clean)
+avg_price = df['price(₹)'].mean()
+print(avg_price)
+df['price(₹)'] = df['price(₹)'].fillna(avg_price)
+nan_count = df['price(₹)'].isnull().sum()
+print(f"Missing values BEFORE fillna: {nan_count}")
+49139.718181818185
+Missing values BEFORE fillna: 0
+print(df['price(₹)'].value_counts().head(10))
+print((df['price(₹)'] == avg_price).sum())
+price(₹)
+48990.0    11
+39990.0    10
+40490.0     9
+59990.0     8
+92990.0     7
+90990.0     6
+62990.0     6
+54990.0     5
+45490.0     5
+28990.0     4
+Name: count, dtype: int64
+0
+print(((df['price(₹)'] - avg_price).abs() < 0.1).sum())
+0
+(df['price(₹)'] == avg_price).sum()
+np.int64(0)
+count = (df['price(₹)'] == avg_price).sum()
+print(f"The avg_price {avg_price} appears {count} times")
+The avg_price 49139.718181818185 appears 0 times
+ 
+df['price(₹)'].value_counts()
+price(₹)
+48990.0    11
+39990.0    10
+40490.0     9
+59990.0     8
+92990.0     7
+           ..
+245.0       1
+328.0       1
+899.0       1
+499.0       1
+309.0       1
+Name: count, Length: 122, dtype: int64
+ 
+ 
+ 
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48990.0	16 GB	512 GB	Core i5	Windows 11 Home	no rating	457 ratings	Integrated
+1	1	acer	Aspire Lite	15.60	39990.0	16 GB	512 GB	Core i5-12450H	Windows 11 Home	no rating	547 ratings	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41990.0	8 GB	512 GB	Ryzen 7	Windows 11 Home	no rating	43 ratings	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61990.0	16 GB	no storage	AMD Ryzen 7	Windows 11 Home	no rating	487 ratings	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47990.0	24 GB	512 GB	Core i5-1235U	Windows 11 Pro	no rating	no rating_review	Integrated
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        205 non-null    object 
+ 6   storage                    220 non-null    object 
+ 7   cpu_model                  219 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    object 
+ 10  rating_review              220 non-null    object 
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(2), int64(1), object(9)
+memory usage: 20.8+ KB
+df['ram'].value_counts()
+ram
+16 GB     120
+no ram     38
+8 GB       26
+24 GB       8
+32 GB       6
+4 GB        3
+12 GB       2
+6 GB        1
+128 GB      1
+Name: count, dtype: int64
+#GB = MB / 1024   # binary system (most common in computing)
+def ram_clean(value):
+    result = str(value)
+    result = result.replace('no ram', '1')
+    if 'GB' in result:
+         mb = result.split()[0]
+         return float(mb)
+    elif 'MB' in result:
+         mb = float(result.split()[0])
+         mb = mb / 1024
+         return mb
+        
+
+        
+   
+
+df['ram'] = df['ram'].apply(ram_clean)
+avg_price = df['ram'].mean()
+print(avg_price)
+df['ram'] = df['ram'].replace('1', avg_price)
+df['ram'] = df['ram'].fillna(avg_price)
+
+
+
+    
+16.059880239520957
+df['ram'].value_counts()
+ram
+16.00000     120
+16.05988      53
+8.00000       26
+24.00000       8
+32.00000       6
+4.00000        3
+12.00000       2
+6.00000        1
+128.00000      1
+Name: count, dtype: int64
+df['ram'] = df['ram'].round(2)
+df['ram'] = df['ram'].astype(int)
+df['ram'].value_counts()
+ram
+16     173
+8       26
+24       8
+32       6
+4        3
+12       2
+6        1
+128      1
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    object 
+ 7   cpu_model                  219 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    object 
+ 10  rating_review              220 non-null    object 
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(2), int64(2), object(8)
+memory usage: 20.8+ KB
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48990.0	16	512 GB	Core i5	Windows 11 Home	no rating	457 ratings	Integrated
+1	1	acer	Aspire Lite	15.60	39990.0	16	512 GB	Core i5-12450H	Windows 11 Home	no rating	547 ratings	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41990.0	8	512 GB	Ryzen 7	Windows 11 Home	no rating	43 ratings	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61990.0	16	no storage	AMD Ryzen 7	Windows 11 Home	no rating	487 ratings	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47990.0	24	512 GB	Core i5-1235U	Windows 11 Pro	no rating	no rating_review	Integrated
+df['storage'].value_counts()
+storage
+512 GB        108
+no storage     58
+1 TB           31
+256 GB         15
+128 GB          6
+1000 GB         1
+64 GB           1
+Name: count, dtype: int64
+#GB = MB / 1024   # binary system (most common in computing)
+def storage_clean(value):
+    result = str(value)
+    result = result.replace('no storage', '1')
+    if 'GB' in result:
+        mb = result.split()[0]
+        return int(float(mb))
+    elif 'MB' in result:
+        mb = float(result.split()[0])
+        mb = mb / 1024
+        return mb
+    elif 'TB' in result:
+        mb = float(result.split()[0])
+        mb = int(mb) * 1024
+        return int(mb)
+         
+ 
+   
+
+df['storage'] = df['storage'].apply(storage_clean)
+avg_price = df['storage'].mean()
+print(avg_price)
+df['storage'] = df['storage'].replace('1', avg_price)
+df['storage'] = df['storage'].fillna(avg_price)
+    
+572.2962962962963
+df['storage'].value_counts()
+storage
+512.000000     108
+572.296296      58
+1024.000000     31
+256.000000      15
+128.000000       6
+1000.000000      1
+64.000000        1
+Name: count, dtype: int64
+df['storage'].value_counts()
+storage
+512.000000     108
+572.296296      58
+1024.000000     31
+256.000000      15
+128.000000       6
+1000.000000      1
+64.000000        1
+Name: count, dtype: int64
+df['ram'].value_counts()
+ram
+16     173
+8       26
+24       8
+32       6
+4        3
+12       2
+6        1
+128      1
+Name: count, dtype: int64
+df['storage'] = df['storage'].round(2)
+#df['ram'] = df['ram'].round(2)
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    float64
+ 7   cpu_model                  219 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    object 
+ 10  rating_review              220 non-null    object 
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(2), object(7)
+memory usage: 20.8+ KB
+print("Reached rounding step")
+df['storage'] = df['storage'].round(1)
+print("Rounded successfully")
+Reached rounding step
+Rounded successfully
+print(df['storage'].head())
+print(df['storage'].dtype)
+0    512.0
+1    512.0
+2    512.0
+3    572.3
+4    512.0
+Name: storage, dtype: float64
+float64
+df['storage'] = df['storage'].astype(int)
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  219 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    object 
+ 10  rating_review              220 non-null    object 
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(2), int64(3), object(7)
+memory usage: 20.8+ KB
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48990.0	16	512	Core i5	Windows 11 Home	no rating	457 ratings	Integrated
+1	1	acer	Aspire Lite	15.60	39990.0	16	512	Core i5-12450H	Windows 11 Home	no rating	547 ratings	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41990.0	8	512	Ryzen 7	Windows 11 Home	no rating	43 ratings	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61990.0	16	572	AMD Ryzen 7	Windows 11 Home	no rating	487 ratings	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47990.0	24	512	Core i5-1235U	Windows 11 Pro	no rating	no rating_review	Integrated
+df['cpu_model'].value_counts()
+cpu_model
+no cpu_model           43
+Core i5                41
+Ryzen 7                15
+Apple M4               11
+Ryzen 5                10
+Others                 10
+Core i3                 9
+Core i5-12450H          8
+Intel Core i7           8
+Intel Core Ultra 5      6
+AMD Ryzen 7             5
+Ryzen 3                 5
+Intel Core 7            4
+Intel Core 5            4
+Intel Core i5           4
+Apple M2                4
+Celeron N4020           4
+Ryzen 9                 3
+Snapdragon X            2
+Intel Core Ultra 9      2
+Athlon                  2
+Core i3 Family          2
+MediaTek Helio          2
+Snapdragon              2
+Core i5-1235U           1
+Ryzen 3 5300U           1
+Celeron N               1
+Intel Core Ultra 7      1
+Intel Core i7-1355U     1
+Celeron                 1
+Core i5 Family          1
+Intel Core i3           1
+Ryzen AI                1
+Intel Core i9           1
+Core i7-13700K          1
+Core i7                 1
+Core i5-8200Y           1
+Name: count, dtype: int64
+def cpu_model_clean(value):
+    result = str(value)
+    if 'no cpu_model' in result:
+        return np.nan
+    return result
+    
+ 
+   
+
+df['cpu_model'] = df['cpu_model'].apply(cpu_model_clean)
+avg_price = df['cpu_model'].mode()[0]
+print(avg_price)
+df['cpu_model'] = df['cpu_model'].fillna(avg_price)
+    
+Core i5
+df['cpu_model'].value_counts()
+cpu_model
+Core i5                84
+Ryzen 7                15
+Apple M4               11
+Others                 10
+Ryzen 5                10
+Core i3                 9
+Intel Core i7           8
+Core i5-12450H          8
+Intel Core Ultra 5      6
+Ryzen 3                 5
+AMD Ryzen 7             5
+Celeron N4020           4
+Intel Core i5           4
+Apple M2                4
+Intel Core 5            4
+Intel Core 7            4
+Ryzen 9                 3
+MediaTek Helio          2
+Snapdragon X            2
+Athlon                  2
+Core i3 Family          2
+Intel Core Ultra 9      2
+Snapdragon              2
+Core i5-1235U           1
+Celeron N               1
+Ryzen 3 5300U           1
+Intel Core Ultra 7      1
+Intel Core i7-1355U     1
+Celeron                 1
+nan                     1
+Core i5 Family          1
+Intel Core i3           1
+Ryzen AI                1
+Intel Core i9           1
+Core i7-13700K          1
+Core i7                 1
+Core i5-8200Y           1
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    object 
+ 10  rating_review              220 non-null    object 
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(2), int64(3), object(7)
+memory usage: 20.8+ KB
+df['operating_system'].value_counts()
+operating_system
+Windows 11 Home                                                       145
+no operating_system                                                    35
+Mac OS                                                                 13
+Windows 11 Pro                                                          6
+Windows 11                                                              6
+Chrome OS                                                               3
+Windows 11 Home 64, English                                             3
+PrimeOS 3.0                                                             2
+Compatible with Windows 8/10/11, Mac OS, iOS 13 and above, android      2
+Window Home 11                                                          1
+Android                                                                 1
+Windows                                                                 1
+Linux, Windows 8                                                        1
+Linux, Windows 7, Windows XP                                            1
+Name: count, dtype: int64
+def operating_system_clean(value):
+    result = str(value)
+    if 'no operating_system' in result:
+        return np.nan
+    return result
+    
+ 
+   
+df['operating_system'] = df['operating_system'].apply(operating_system_clean)
+avg_price = df['operating_system'].mode()[0]
+print(avg_price)
+df['operating_system'] = df['operating_system'].fillna(avg_price)
+    
+Windows 11 Home
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48990.0	16	512	Core i5	Windows 11 Home	no rating	457 ratings	Integrated
+1	1	acer	Aspire Lite	15.60	39990.0	16	512	Core i5-12450H	Windows 11 Home	no rating	547 ratings	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41990.0	8	512	Ryzen 7	Windows 11 Home	no rating	43 ratings	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61990.0	16	572	AMD Ryzen 7	Windows 11 Home	no rating	487 ratings	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47990.0	24	512	Core i5-1235U	Windows 11 Pro	no rating	no rating_review	Integrated
+df['operating_system'].value_counts()
+operating_system
+Windows 11 Home                                                       180
+Mac OS                                                                 13
+Windows 11 Pro                                                          6
+Windows 11                                                              6
+Chrome OS                                                               3
+Windows 11 Home 64, English                                             3
+PrimeOS 3.0                                                             2
+Compatible with Windows 8/10/11, Mac OS, iOS 13 and above, android      2
+Window Home 11                                                          1
+Android                                                                 1
+Windows                                                                 1
+Linux, Windows 8                                                        1
+Linux, Windows 7, Windows XP                                            1
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    object 
+ 10  rating_review              220 non-null    object 
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(2), int64(3), object(7)
+memory usage: 20.8+ KB
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48990.0	16	512	Core i5	Windows 11 Home	no rating	457 ratings	Integrated
+1	1	acer	Aspire Lite	15.60	39990.0	16	512	Core i5-12450H	Windows 11 Home	no rating	547 ratings	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41990.0	8	512	Ryzen 7	Windows 11 Home	no rating	43 ratings	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61990.0	16	572	AMD Ryzen 7	Windows 11 Home	no rating	487 ratings	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47990.0	24	512	Core i5-1235U	Windows 11 Pro	no rating	no rating_review	Integrated
+df['rating'].value_counts()
+rating
+no rating    177
+3.7           18
+3.6            9
+3.4            7
+3.5            6
+3.3            3
+Name: count, dtype: int64
+df.head(20)
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48990.0	16	512	Core i5	Windows 11 Home	no rating	457 ratings	Integrated
+1	1	acer	Aspire Lite	15.60	39990.0	16	512	Core i5-12450H	Windows 11 Home	no rating	547 ratings	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41990.0	8	512	Ryzen 7	Windows 11 Home	no rating	43 ratings	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61990.0	16	572	AMD Ryzen 7	Windows 11 Home	no rating	487 ratings	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47990.0	24	512	Core i5-1235U	Windows 11 Pro	no rating	no rating_review	Integrated
+5	5	acer	Aspire Lite	15.60	40490.0	16	512	Core i5	Windows 11 Home	3.7	48 ratings	Integrated
+6	6	HP	HP Laptop	17.30	62990.0	16	512	Core i5	Windows 11 Home	3.6	254 ratings	Integrated
+7	7	HP	HP Laptop	15.59	35490.0	12	512	Core i3 Family	Windows 11 Home	no rating	642 ratings	Integrated
+8	8	Lenovo	Lenovo 14	14.00	45658.0	16	512	Core i5	Windows 11 Home	no rating	no rating_review	Integrated
+9	9	HP	HP 15	15.60	22900.0	8	256	Athlon	Windows 11 Home	no rating	4 ratings	Integrated
+10	10	acer	Aspire Lite	15.60	40490.0	16	512	Core i5	Windows 11 Home	3.7	48 ratings	Integrated
+11	11	Apple	13-inch MacBook Air (M4, 2025)	13.60	92990.0	16	256	Apple M4	Mac OS	no rating	620 ratings	Integrated
+12	12	acer	Aspire Lite	15.60	27990.0	16	512	Others	Windows 11 Home	no rating	1,787 ratings	Integrated
+13	13	acer	Aspire 3	15.60	19990.0	8	256	Celeron N	Windows 11 Home	3.4	643 ratings	Integrated
+14	14	HP	HP Laptop	15.59	30990.0	8	512	Core i3	Windows 11 Home	no rating	642 ratings	Integrated
+15	15	ASUS	ASUS Vivobook Go 14	14.00	28990.0	8	512	Ryzen 3	Windows 11 Home	no rating	113 ratings	Integrated
+16	16	ASUS	ASUS Vivobook 16X	16.00	67990.0	16	512	Intel Core i7	Windows 11 Home	3.3	12 ratings	Dedicated
+17	17	Dell	Inspiron	15.60	39990.0	16	512	Ryzen 5	Windows 11 Home	no rating	79 ratings	Integrated
+18	18	acer	Aspire Lite	15.60	29990.0	16	512	Ryzen 5	Windows 11 Home	no rating	1,787 ratings	Integrated
+19	19	acer	Aspire Lite	15.60	23990.0	8	512	Ryzen 3 5300U	Windows 11 Home	no rating	1,787 ratings	Integrated
+ 
+def rating_clean(value):
+    result = str(value)
+    if 'no rating' in result:
+        return np.nan
+    return result
+    
+ 
+   
+df['rating'] = df['rating'].apply(rating_clean)
+avg_price = df['rating'].mode()[0]
+print(avg_price)
+df['rating'] = df['rating'].fillna(avg_price)
+    
+3.7
+df['rating'].value_counts()
+rating
+3.7    195
+3.6      9
+3.4      7
+3.5      6
+3.3      3
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    object 
+ 10  rating_review              220 non-null    object 
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(2), int64(3), object(7)
+memory usage: 20.8+ KB
+df['rating'] = df['rating'].astype(float)
+df['rating'] = df['rating'].round(2)
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    object 
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(3), object(6)
+memory usage: 20.8+ KB
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48990.0	16	512	Core i5	Windows 11 Home	3.7	457 ratings	Integrated
+1	1	acer	Aspire Lite	15.60	39990.0	16	512	Core i5-12450H	Windows 11 Home	3.7	547 ratings	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41990.0	8	512	Ryzen 7	Windows 11 Home	3.7	43 ratings	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61990.0	16	572	AMD Ryzen 7	Windows 11 Home	3.7	487 ratings	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47990.0	24	512	Core i5-1235U	Windows 11 Pro	3.7	no rating_review	Integrated
+df['rating_review'].value_counts()
+rating_review
+620 ratings      11
+457 ratings      10
+547 ratings       8
+48 ratings        8
+8 ratings         6
+                 ..
+85 ratings        1
+87 ratings        1
+349 ratings       1
+5,759 ratings     1
+474 ratings       1
+Name: count, Length: 114, dtype: int64
+def rating_review_clean(value):
+    result = str(value)
+    if 'no rating_review' in result:
+        return np.nan
+    #elif 'no' in result:
+        #return np.nan
+    number = result.split()[0]
+    number = number.replace(',', '')
+    number = int(number)
+    return number
+    
+
+df['rating_review'] = df['rating_review'].apply(rating_review_clean)
+avg_price = df['rating_review'].mean()
+print(avg_price)
+df['rating_review'] = df['rating_review'].replace('no', avg_price)
+df['rating_review'] = df['rating_review'].fillna(avg_price)
+895.106976744186
+df['rating_review'] = df['rating_review'].round(1)
+df['rating_review'].value_counts()
+rating_review
+620.0     11
+457.0     10
+547.0      8
+48.0       8
+8.0        6
+          ..
+85.0       1
+87.0       1
+349.0      1
+5759.0     1
+474.0      1
+Name: count, Length: 114, dtype: int64
+df['rating_review'] = df['rating_review'].astype(int)
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+df['rating_review'].value_counts()
+rating_review
+620     11
+457     10
+547      8
+48       8
+8        6
+        ..
+85       1
+87       1
+349      1
+5759     1
+474      1
+Name: count, Length: 114, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+df['graphics_card_description'].value_counts()
+graphics_card_description
+Integrated                      144
+no graphics_card_description     41
+Dedicated                        34
+Intel® UHD Graphics               1
+Name: count, dtype: int64
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48990.0	16	512	Core i5	Windows 11 Home	3.7	457	Integrated
+1	1	acer	Aspire Lite	15.60	39990.0	16	512	Core i5-12450H	Windows 11 Home	3.7	547	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41990.0	8	512	Ryzen 7	Windows 11 Home	3.7	43	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61990.0	16	572	AMD Ryzen 7	Windows 11 Home	3.7	487	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47990.0	24	512	Core i5-1235U	Windows 11 Pro	3.7	895	Integrated
+def graphics_card_description_clean(value):
+    result = str(value)
+    if 'no graphics_card_description' in result:
+        return np.nan
+    return result
+    
+ 
+   
+df['graphics_card_description'] = df['graphics_card_description'].apply(graphics_card_description_clean)
+avg_price = df['graphics_card_description'].mode()[0]
+print(avg_price)
+df['graphics_card_description'] = df['graphics_card_description'].fillna(avg_price)
+    
+Integrated
+df['graphics_card_description'].value_counts()
+graphics_card_description
+Integrated             185
+Dedicated               34
+Intel® UHD Graphics      1
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+df['brand'].value_counts()
+brand
+HP                  41
+Lenovo              35
+ASUS                33
+acer                32
+Apple               15
+Dell                15
+no brand            13
+ZEBRONICS            6
+Portronics           3
+Primebook            2
+Walker               2
+amazon basics        2
+MSI                  2
+Dyazo                2
+Tukzer               2
+Arctic Fox           2
+FUTOPIA              1
+GIZGA essentials     1
+Sounce               1
+Neopticon            1
+THOMSON              1
+GEONIX               1
+Samsung              1
+Tygot                1
+boAt                 1
+VANTRO               1
+Microsoft            1
+Amkette              1
+Google               1
+Name: count, dtype: int64
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	HP	HP Laptop	15.59	48990.0	16	512	Core i5	Windows 11 Home	3.7	457	Integrated
+1	1	acer	Aspire Lite	15.60	39990.0	16	512	Core i5-12450H	Windows 11 Home	3.7	547	Integrated
+2	2	ASUS	ASUS Vivobook 15	15.60	41990.0	8	512	Ryzen 7	Windows 11 Home	3.7	43	Integrated
+3	3	ASUS	ASUS TUF Gaming A15	15.60	61990.0	16	572	AMD Ryzen 7	Windows 11 Home	3.7	487	Dedicated
+4	4	Lenovo	Lenovo 14	14.00	47990.0	24	512	Core i5-1235U	Windows 11 Pro	3.7	895	Integrated
+ 
+def brand_clean(value):
+    result = str(value)
+    result = result.lower()
+    if 'no brand' in result:
+        return np.nan
+    return result
+    
+ 
+   
+df['brand'] = df['brand'].apply(brand_clean)
+avg_price = df['brand'].mode()[0]
+print(avg_price)
+df['brand'] = df['brand'].fillna(avg_price)
+    
+hp
+df['brand'].value_counts()
+brand
+hp                  54
+lenovo              35
+asus                33
+acer                32
+apple               15
+dell                15
+zebronics            6
+portronics           3
+primebook            2
+walker               2
+amazon basics        2
+msi                  2
+dyazo                2
+tukzer               2
+arctic fox           2
+futopia              1
+gizga essentials     1
+sounce               1
+neopticon            1
+thomson              1
+geonix               1
+samsung              1
+tygot                1
+boat                 1
+vantro               1
+microsoft            1
+amkette              1
+google               1
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 219 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+df['model_name'].value_counts()
+model_name
+no model_name                     36
+HP Laptop                         33
+Aspire Lite                       22
+IdeaPad Slim 3                    12
+13-inch MacBook Air (M4, 2025)    11
+                                  ..
+ASUS Vivobook Go 15                1
+IdeaPad 5 2-in-1                   1
+RS-NCPI-22                         1
+Surface Laptop                     1
+Pixelbook Go                       1
+Name: count, Length: 64, dtype: int64
+def model_name_clean(value):
+    result = str(value)
+    result = result.lower()
+    if 'no model_name' in result:
+        return np.nan
+    return result
+    
+ 
+   
+df['model_name'] = df['model_name'].apply(model_name_clean)
+avg_price = df['model_name'].mode()[0]
+print(avg_price)
+df['model_name'] = df['model_name'].fillna(avg_price)
+    
+hp laptop
+df['model_name'].value_counts()
+model_name
+hp laptop                         69
+aspire lite                       22
+ideapad slim 3                    12
+13-inch macbook air (m4, 2025)    11
+inspiron                           9
+                                  ..
+asus vivobook go 15                1
+ideapad 5 2-in-1                   1
+rs-ncpi-22                         1
+surface laptop                     1
+pixelbook go                       1
+Name: count, Length: 64, dtype: int64
+ 
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 220 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+#    gipoteza 
+#1    Yuqori narxdagi noutbuklar odatda yuqori mijoz reytinglariga ega bo‘ladi.  (False)
+#2    HP va Dell kabi premium brendlar kamroq tanilgan brendlarga nisbatan o‘rtacha yuqoriroq baholarga ega bo‘ladi.(False)
+#3   Katta ekran o‘lchamiga ega noutbuklar (15 dyuym va undan katta) kichik ekranli (14 dyuym va undan kichik) noutbuklarga qaraganda yaxshiroq mijoz baholariga ega bo‘ladi.
+#4   Windows 11 tizimida ishlovchi noutbuklar eski versiyalarda (masalan, Windows 10) ishlovchi noutbuklarga nisbatan yuqoriroq baholarga ega bo‘ladi.
+#5   Ko‘proq mijoz sharhlariga ega noutbuklar odatda yuqoriroq umumiy reytinglarga ega bo‘ladi.
+#6   O‘rta narx oralig‘idagi (500–800 dollar) noutbuklar byudjet yoki premium modellarga nisbatan yuqoriroq baholarga ega bo‘ladi.
+#7   O‘zingiz bitta gipoteza qo‘shing.
+#8   Yana bitta gipoteza qo‘shing.
+#9   Har bir test uchun diagramma bo‘lishi kerak.
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 220 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+df['price(₹)'].mean()
+np.float64(49139.718181818185)
+df['rating'].mean()
+np.float64(3.675454545454546)
+df['price(₹)'].value_counts()
+price(₹)
+48990.0    11
+39990.0    10
+40490.0     9
+59990.0     8
+92990.0     7
+           ..
+245.0       1
+328.0       1
+899.0       1
+499.0       1
+309.0       1
+Name: count, Length: 122, dtype: int64
+df[df['brand'] == 'hp' ]['rating'].mean()
+np.float64(3.6851851851851842)
+df[df['brand'] == 'dell' ]['rating'].mean()
+np.float64(3.6533333333333347)
+# 1 gipoteza 
+df.groupby('brand')[['price(₹)', 'rating']].mean()
+price(₹)	rating
+brand		
+acer	37927.500000	3.662500
+amazon basics	669.500000	3.700000
+amkette	799.000000	3.700000
+apple	97123.333333	3.700000
+arctic fox	549.000000	3.700000
+asus	68017.515152	3.666667
+boat	3999.000000	3.700000
+dell	52280.666667	3.653333
+dyazo	572.000000	3.700000
+futopia	16870.000000	3.700000
+geonix	199.000000	3.700000
+gizga essentials	189.000000	3.700000
+google	64990.000000	3.700000
+hp	48558.814815	3.685185
+lenovo	53932.485714	3.680000
+microsoft	129990.000000	3.700000
+msi	117819.500000	3.700000
+neopticon	15990.000000	3.400000
+portronics	372.333333	3.700000
+primebook	17240.000000	3.700000
+samsung	49500.000000	3.700000
+sounce	89.000000	3.700000
+thomson	13990.000000	3.700000
+tukzer	206.000000	3.550000
+tygot	289.000000	3.700000
+vantro	2400.000000	3.700000
+walker	12190.000000	3.700000
+zebronics	450.666667	3.650000
+#df.groupby('gender')[['math score', 'reading score', 'writing score']].mean()
+#df[df.groupby('brand') == 'hp']['rating'].mean()
+#df[df.groupby('brand') == 'dell']['rating'].mean()
+ 
+df.describe()
+Unnamed: 0	screen_size(inches)	price(₹)	ram	storage	rating	rating_review
+count	220.000000	220.000000	220.000000	220.000000	220.000000	220.000000	220.000000
+mean	109.500000	15.140955	49139.718182	16.045455	572.218182	3.675455	895.104545
+std	63.652704	0.845727	37523.700818	8.763651	212.014878	0.077267	2370.151191
+min	0.000000	11.500000	89.000000	4.000000	64.000000	3.300000	1.000000
+25%	54.750000	15.140000	27487.250000	16.000000	512.000000	3.700000	42.750000
+50%	109.500000	15.590000	45823.500000	16.000000	512.000000	3.700000	189.000000
+75%	164.250000	15.600000	65990.000000	16.000000	572.000000	3.700000	620.000000
+max	219.000000	17.320000	309990.000000	128.000000	1024.000000	3.700000	26070.000000
+df['price(₹)'].isnull().sum()
+np.int64(0)
+s = df['storage'].count()
+print(s)
+220
+df['storage'].value_counts(normalize= True)
+storage
+512     0.490909
+572     0.263636
+1024    0.140909
+256     0.068182
+128     0.027273
+1000    0.004545
+64      0.004545
+Name: proportion, dtype: float64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 220 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+ 
+print(df.columns)
+Index(['Unnamed: 0', 'brand', 'model_name', 'screen_size(inches)', 'price(₹)',
+       'ram', 'storage', 'cpu_model', 'operating_system', 'rating',
+       'rating_review', 'graphics_card_description'],
+      dtype='object')
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	hp	hp laptop	15.59	48990.0	16	512	Core i5	Windows 11 Home	3.7	457	Integrated
+1	1	acer	aspire lite	15.60	39990.0	16	512	Core i5-12450H	Windows 11 Home	3.7	547	Integrated
+2	2	asus	asus vivobook 15	15.60	41990.0	8	512	Ryzen 7	Windows 11 Home	3.7	43	Integrated
+3	3	asus	asus tuf gaming a15	15.60	61990.0	16	572	AMD Ryzen 7	Windows 11 Home	3.7	487	Dedicated
+4	4	lenovo	lenovo 14	14.00	47990.0	24	512	Core i5-1235U	Windows 11 Pro	3.7	895	Integrated
+df['model_name'].value_counts()
+model_name
+hp laptop                         69
+aspire lite                       22
+ideapad slim 3                    12
+13-inch macbook air (m4, 2025)    11
+inspiron                           9
+                                  ..
+asus vivobook go 15                1
+ideapad 5 2-in-1                   1
+rs-ncpi-22                         1
+surface laptop                     1
+pixelbook go                       1
+Name: count, Length: 64, dtype: int64
+print(df.columns.tolist())
+['Unnamed: 0', 'brand', 'model_name', 'screen_size(inches)', 'price(₹)', 'ram', 'storage', 'cpu_model', 'operating_system', 'rating', 'rating_review', 'graphics_card_description']
+hp_mean = df[df['brand'] == 'hp']['price(₹)'].mean()
+dell_mean = df[df['brand'] == 'dell']['price(₹)'].mean()
+print(f" dell mean: {dell_mean}")
+print(f" hp mean: {hp_mean}")
+ dell mean: 52280.666666666664
+ hp mean: 48558.81481481482
+# 2 gipoteza 
+all_means = df.groupby('brand')['rating'].mean().sort_values(ascending= False)
+print(f" all means: {all_means}")
+ all means: brand
+portronics          3.700000
+amazon basics       3.700000
+apple               3.700000
+amkette             3.700000
+geonix              3.700000
+boat                3.700000
+futopia             3.700000
+dyazo               3.700000
+gizga essentials    3.700000
+msi                 3.700000
+google              3.700000
+arctic fox          3.700000
+walker              3.700000
+vantro              3.700000
+tygot               3.700000
+microsoft           3.700000
+primebook           3.700000
+thomson             3.700000
+sounce              3.700000
+samsung             3.700000
+hp                  3.685185
+lenovo              3.680000
+asus                3.666667
+acer                3.662500
+dell                3.653333
+zebronics           3.650000
+tukzer              3.550000
+neopticon           3.400000
+Name: rating, dtype: float64
+#    gipoteza 
+#1    Yuqori narxdagi noutbuklar odatda yuqori mijoz reytinglariga ega bo‘ladi.  (False)
+#2    HP va Dell kabi premium brendlar kamroq tanilgan brendlarga nisbatan o‘rtacha yuqoriroq baholarga ega bo‘ladi.(False)
+#3   Katta ekran o‘lchamiga ega noutbuklar (15 dyuym va undan katta)
+#  kichik ekranli (14 dyuym va undan kichik) noutbuklarga qaraganda yaxshiroq mijoz baholariga ega bo‘ladi. (False)
+#4   Windows 11 tizimida ishlovchi noutbuklar eski versiyalarda
+#  (masalan, Windows 10) ishlovchi noutbuklarga nisbatan yuqoriroq baholarga ega bo‘ladi.
+#5   Ko‘proq mijoz sharhlariga ega noutbuklar odatda yuqoriroq umumiy reytinglarga ega bo‘ladi.
+#6   O‘rta narx oralig‘idagi (500–800 dollar) noutbuklar byudjet yoki premium modellarga nisbatan yuqoriroq baholarga ega bo‘ladi.
+#7   O‘zingiz bitta gipoteza qo‘shing.
+#8   Yana bitta gipoteza qo‘shing.
+#9   Har bir test uchun diagramma bo‘lishi kerak.
+correlation = df[['price(₹)', 'rating']].corr()
+print(correlation)
+          price(₹)    rating
+price(₹)  1.000000  0.060514
+rating    0.060514  1.000000
+df['rating'].value_counts()
+rating
+3.7    195
+3.6      9
+3.4      7
+3.5      6
+3.3      3
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 220 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+# 3 gipoteza agar rating review bosa
+q1 = df['screen_size(inches)'].quantile(0.75)
+print(q1)
+# 1000  ta rating_reviewni 25 % ni ortacha bali razmeri inchda     15.6
+
+
+
+above = df[df['screen_size(inches)'] >= q1 ]['rating_review'].mean()
+low = df[df['screen_size(inches)'] < q1 ]['rating_review'].mean()
+print(f" 15 dyum va undan kattalar: {above}")
+print(f" 15 dyum dan kichiklar: {low}")
+15.6
+ 15 dyum va undan kattalar: 324.42857142857144
+ 15 dyum dan kichiklar: 1353.516393442623
+df['rating_review'].value_counts()
+rating_review
+620     11
+457     10
+547      8
+48       8
+8        6
+        ..
+85       1
+87       1
+349      1
+5759     1
+474      1
+Name: count, Length: 114, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 220 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+df['rating_review'].head(20)
+0      457
+1      547
+2       43
+3      487
+4      895
+5       48
+6      254
+7      642
+8      895
+9        4
+10      48
+11     620
+12    1787
+13     643
+14     642
+15     113
+16      12
+17      79
+18    1787
+19    1787
+Name: rating_review, dtype: int64
+ 
+df['operating_system'].value_counts()
+operating_system
+Windows 11 Home                                                       180
+Mac OS                                                                 13
+Windows 11 Pro                                                          6
+Windows 11                                                              6
+Chrome OS                                                               3
+Windows 11 Home 64, English                                             3
+PrimeOS 3.0                                                             2
+Compatible with Windows 8/10/11, Mac OS, iOS 13 and above, android      2
+Window Home 11                                                          1
+Android                                                                 1
+Windows                                                                 1
+Linux, Windows 8                                                        1
+Linux, Windows 7, Windows XP                                            1
+Name: count, dtype: int64
+#    gipoteza 
+#1    Yuqori narxdagi noutbuklar odatda yuqori mijoz reytinglariga ega bo‘ladi.  (False)
+#2    HP va Dell kabi premium brendlar kamroq tanilgan brendlarga nisbatan o‘rtacha yuqoriroq baholarga ega bo‘ladi.(False)
+#3   Katta ekran o‘lchamiga ega noutbuklar (15 dyuym va undan katta)
+#  kichik ekranli (14 dyuym va undan kichik) noutbuklarga qaraganda yaxshiroq mijoz baholariga ega bo‘ladi. (False)
+#4   Windows 11 tizimida ishlovchi noutbuklar eski versiyalarda
+#  (masalan, Windows 8) ishlovchi noutbuklarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+#5   Ko‘proq mijoz sharhlariga ega noutbuklar odatda yuqoriroq umumiy reytinglarga ega bo‘ladi.
+#6   O‘rta narx oralig‘idagi (500–800 dollar) noutbuklar byudjet yoki premium modellarga nisbatan yuqoriroq baholarga ega bo‘ladi.
+#7   O‘zingiz bitta gipoteza qo‘shing.
+#8   Yana bitta gipoteza qo‘shing.
+#9   Har bir test uchun diagramma bo‘lishi kerak.
+df['operating_system'] = df['operating_system'].str.lower().str.strip()
+# 4 gipoteza 
+
+higher = df[df['operating_system'] == 'windows 11']['rating'].mean()
+lower = df[df['operating_system'] == 'linux, windows 8']['rating'].mean()
+print(f"higher: {higher} lower: {lower}")
+higher: 3.6999999999999997 lower: 3.7
+df['operating_system'].value_counts()
+operating_system
+windows 11 home                                                       180
+mac os                                                                 13
+windows 11 pro                                                          6
+windows 11                                                              6
+chrome os                                                               3
+windows 11 home 64, english                                             3
+primeos 3.0                                                             2
+compatible with windows 8/10/11, mac os, ios 13 and above, android      2
+window home 11                                                          1
+android                                                                 1
+windows                                                                 1
+linux, windows 8                                                        1
+linux, windows 7, windows xp                                            1
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 220 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+(df['operating_system'] == 'windows 8').sum()
+np.int64(0)
+df['operating_system'].unique()
+array(['windows 11 home', 'windows 11 pro', 'mac os', 'window home 11',
+       'primeos 3.0', 'windows 11', 'chrome os',
+       'windows 11 home 64, english', 'android', 'windows',
+       'compatible with windows 8/10/11, mac os, ios 13 and above, android',
+       'linux, windows 8', 'linux, windows 7, windows xp'], dtype=object)
+df['operating_system'] = df['operating_system'].str.lower().str.strip()
+df['operating_system'].value_counts()
+operating_system
+windows 11 home                                                       180
+mac os                                                                 13
+windows 11 pro                                                          6
+windows 11                                                              6
+chrome os                                                               3
+windows 11 home 64, english                                             3
+primeos 3.0                                                             2
+compatible with windows 8/10/11, mac os, ios 13 and above, android      2
+window home 11                                                          1
+android                                                                 1
+windows                                                                 1
+linux, windows 8                                                        1
+linux, windows 7, windows xp                                            1
+Name: count, dtype: int64
+(df['operating_system'] == 'compatible with windows 8/10/11, mac os, ios 13 and above, android').sum()
+np.int64(2)
+df['price(₹)'].value_counts()
+price(₹)
+48990.0    11
+39990.0    10
+40490.0     9
+59990.0     8
+92990.0     7
+           ..
+245.0       1
+328.0       1
+899.0       1
+499.0       1
+309.0       1
+Name: count, Length: 122, dtype: int64
+#5 gipoteza
+
+q2 = df['rating_review'].quantile(0.75)
+print(q2)
+# 1000  ta odandan 25 % ni ortacha rating_review boyicha boladi  620.0
+above = df[df['rating_review'] >= q2]['rating'].mean()
+lower = df[df['rating_review'] < q2]['rating'].mean()
+print(f" above: {above} lower: {lower}")
+620.0
+ above: 3.678461538461538 lower: 3.674193548387097
+ 
+#    gipoteza 
+#1    Yuqori narxdagi noutbuklar odatda yuqori mijoz reytinglariga ega bo‘ladi.  (False)
+#2    HP va Dell kabi premium brendlar kamroq tanilgan brendlarga nisbatan o‘rtacha yuqoriroq baholarga ega bo‘ladi.(False)
+#3   Katta ekran o‘lchamiga ega noutbuklar (15 dyuym va undan katta)
+#  kichik ekranli (14 dyuym va undan kichik) noutbuklarga qaraganda yaxshiroq mijoz baholariga ega bo‘ladi. (False)
+#4   Windows 11 tizimida ishlovchi noutbuklar eski versiyalarda
+#  (masalan, Windows 8) ishlovchi noutbuklarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+#5   Ko‘proq mijoz sharhlariga ega noutbuklar odatda yuqoriroq umumiy reytinglarga ega bo‘ladi.   (False)
+#6   O‘rta narx oralig‘idagi (500–800 dollar) noutbuklar byudjet yoki premium modellarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+#7   O‘zingiz bitta gipoteza qo‘shing.
+#8   Yana bitta gipoteza qo‘shing.
+#9   Har bir test uchun diagramma bo‘lishi kerak.
+#6 gipoteza
+#   500$    43990 rupee
+#   800$    70384 rupee
+avg = df['price(₹)'].mean()
+print(avg)
+df['price(₹)'].value_counts()
+baho = df[(df['price(₹)'] > 43990.0 ) & (df['price(₹)'] <= 70384.0 )]['rating'].mean()
+m = df.groupby('model_name')['rating'].mean()
+print(baho, m)
+49139.718181818185
+3.668055555555556 model_name
+13-inch macbook air (m4, 2025)    3.7
+14-he0015qu                       3.7
+16-ag1048au                       3.7
+acer alg                          3.7
+apex                              3.7
+                                 ... 
+tuf gaming f15                    3.7
+v15                               3.7
+vivobook go 15                    3.7
+vostro 3530                       3.5
+yoga slim 7                       3.7
+Name: rating, Length: 64, dtype: float64
+df['model_name'].value_counts()
+model_name
+hp laptop                         69
+aspire lite                       22
+ideapad slim 3                    12
+13-inch macbook air (m4, 2025)    11
+inspiron                           9
+                                  ..
+asus vivobook go 15                1
+ideapad 5 2-in-1                   1
+rs-ncpi-22                         1
+surface laptop                     1
+pixelbook go                       1
+Name: count, Length: 64, dtype: int64
+df.groupby('model_name')['rating'].mean()
+model_name
+13-inch macbook air (m4, 2025)    3.7
+14-he0015qu                       3.7
+16-ag1048au                       3.7
+acer alg                          3.7
+apex                              3.7
+                                 ... 
+tuf gaming f15                    3.7
+v15                               3.7
+vivobook go 15                    3.7
+vostro 3530                       3.5
+yoga slim 7                       3.7
+Name: rating, Length: 64, dtype: float64
+ 
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 220 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+df.head()
+Unnamed: 0	brand	model_name	screen_size(inches)	price(₹)	ram	storage	cpu_model	operating_system	rating	rating_review	graphics_card_description
+0	0	hp	hp laptop	15.59	48990.0	16	512	Core i5	windows 11 home	3.7	457	Integrated
+1	1	acer	aspire lite	15.60	39990.0	16	512	Core i5-12450H	windows 11 home	3.7	547	Integrated
+2	2	asus	asus vivobook 15	15.60	41990.0	8	512	Ryzen 7	windows 11 home	3.7	43	Integrated
+3	3	asus	asus tuf gaming a15	15.60	61990.0	16	572	AMD Ryzen 7	windows 11 home	3.7	487	Dedicated
+4	4	lenovo	lenovo 14	14.00	47990.0	24	512	Core i5-1235U	windows 11 pro	3.7	895	Integrated
+df['screen_size(inches)'].value_counts()
+screen_size(inches)
+15.60    77
+15.14    47
+15.59    24
+14.00    21
+13.60    15
+16.00    13
+15.00     4
+14.10     4
+15.98     3
+11.60     2
+17.30     1
+14.02     1
+16.10     1
+11.50     1
+17.32     1
+15.30     1
+15.75     1
+16.14     1
+13.80     1
+13.30     1
+Name: count, dtype: int64
+ 
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 220 entries, 0 to 219
+Data columns (total 12 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 220 non-null    int64  
+ 1   brand                      220 non-null    object 
+ 2   model_name                 220 non-null    object 
+ 3   screen_size(inches)        220 non-null    float64
+ 4   price(₹)                   220 non-null    float64
+ 5   ram                        220 non-null    int64  
+ 6   storage                    220 non-null    int64  
+ 7   cpu_model                  220 non-null    object 
+ 8   operating_system           220 non-null    object 
+ 9   rating                     220 non-null    float64
+ 10  rating_review              220 non-null    int64  
+ 11  graphics_card_description  220 non-null    object 
+dtypes: float64(3), int64(4), object(5)
+memory usage: 20.8+ KB
+#    gipoteza 
+#1    Yuqori narxdagi noutbuklar odatda yuqori mijoz reytinglariga ega bo‘ladi.  (False)
+#2    HP va Dell kabi premium brendlar kamroq tanilgan brendlarga nisbatan o‘rtacha yuqoriroq baholarga ega bo‘ladi.(False)
+#3   Katta ekran o‘lchamiga ega noutbuklar (15 dyuym va undan katta)
+#  kichik ekranli (14 dyuym va undan kichik) noutbuklarga qaraganda yaxshiroq mijoz baholariga ega bo‘ladi. (False)
+#4   Windows 11 tizimida ishlovchi noutbuklar eski versiyalarda
+#  (masalan, Windows 8) ishlovchi noutbuklarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+#5   Ko‘proq mijoz sharhlariga ega noutbuklar odatda yuqoriroq umumiy reytinglarga ega bo‘ladi.   (False)
+#6   O‘rta narx oralig‘idagi (500–800 dollar) noutbuklar byudjet yoki premium modellarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+#7   screen size yani dyumi kickina laptopla ni narxi qimmat qoganlaga qaraganda (False) 
+#8   cpu model ryzen 7 boganla arzonro narxi core i5 ga qaraganda (False)
+#9   Har bir test uchun diagramma bo‘lishi kerak.
+# 7 gipoteza
+
+q3 = df['screen_size(inches)'].quantile(0.75)
+print(q3)
+expensive = df[df['screen_size(inches)'] <= q3]['price(₹)'].mean()
+cheaper = df[df['screen_size(inches)'] > q3]['price(₹)'].mean()
+print(f" expensive: {expensive} cheaper: {cheaper}")
+15.6
+ expensive: 44060.14572864322 cheaper: 97274.71428571429
+df['price(₹)'].value_counts()
+price(₹)
+48990.0    11
+39990.0    10
+40490.0     9
+59990.0     8
+92990.0     7
+           ..
+245.0       1
+328.0       1
+899.0       1
+499.0       1
+309.0       1
+Name: count, Length: 122, dtype: int64
+df['cpu_model'].value_counts()
+cpu_model
+Core i5                84
+Ryzen 7                15
+Apple M4               11
+Others                 10
+Ryzen 5                10
+Core i3                 9
+Intel Core i7           8
+Core i5-12450H          8
+Intel Core Ultra 5      6
+Ryzen 3                 5
+AMD Ryzen 7             5
+Celeron N4020           4
+Intel Core i5           4
+Apple M2                4
+Intel Core 5            4
+Intel Core 7            4
+Ryzen 9                 3
+MediaTek Helio          2
+Snapdragon X            2
+Athlon                  2
+Core i3 Family          2
+Intel Core Ultra 9      2
+Snapdragon              2
+Core i5-1235U           1
+Celeron N               1
+Ryzen 3 5300U           1
+Intel Core Ultra 7      1
+Intel Core i7-1355U     1
+Celeron                 1
+nan                     1
+Core i5 Family          1
+Intel Core i3           1
+Ryzen AI                1
+Intel Core i9           1
+Core i7-13700K          1
+Core i7                 1
+Core i5-8200Y           1
+Name: count, dtype: int64
+# 8 gipoteza
+
+
+amd = df[df['cpu_model'] == 'Ryzen 7']['price(₹)'].mean()
+intel = df[df['cpu_model'] == 'Core i5']['price(₹)'].mean()
+print(f"amd: {amd} intel: {intel}")
+amd: 57323.333333333336 intel: 28865.54761904762
+ 
+# visualization  task
+# 1 task
+ 
+#    gipoteza 
+#1    Yuqori narxdagi noutbuklar odatda yuqori mijoz reytinglariga ega bo‘ladi.  (False)
+#2    HP va Dell kabi premium brendlar kamroq tanilgan brendlarga nisbatan o‘rtacha yuqoriroq baholarga ega bo‘ladi.(False)
+#3   Katta ekran o‘lchamiga ega noutbuklar (15 dyuym va undan katta)
+#  kichik ekranli (14 dyuym va undan kichik) noutbuklarga qaraganda yaxshiroq mijoz baholariga ega bo‘ladi. (False)
+#4   Windows 11 tizimida ishlovchi noutbuklar eski versiyalarda
+#  (masalan, Windows 8) ishlovchi noutbuklarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+#5   Ko‘proq mijoz sharhlariga ega noutbuklar odatda yuqoriroq umumiy reytinglarga ega bo‘ladi.   (False)
+#6   O‘rta narx oralig‘idagi (500–800 dollar) noutbuklar byudjet yoki premium modellarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+#7   screen size yani dyumi kickina laptopla ni narxi qimmat qoganlaga qaraganda (False) 
+#8   cpu model ryzen 7 boganla arzonro narxi core i5 ga qaraganda (False)
+#9   Har bir test uchun diagramma bo‘lishi kerak.
+# 1 gipoteza 
+df.groupby('brand')[['price(₹)', 'rating']].mean()
+price(₹)	rating
+brand		
+acer	37927.500000	3.662500
+amazon basics	669.500000	3.700000
+amkette	799.000000	3.700000
+apple	97123.333333	3.700000
+arctic fox	549.000000	3.700000
+asus	68017.515152	3.666667
+boat	3999.000000	3.700000
+dell	52280.666667	3.653333
+dyazo	572.000000	3.700000
+futopia	16870.000000	3.700000
+geonix	199.000000	3.700000
+gizga essentials	189.000000	3.700000
+google	64990.000000	3.700000
+hp	48558.814815	3.685185
+lenovo	53932.485714	3.680000
+microsoft	129990.000000	3.700000
+msi	117819.500000	3.700000
+neopticon	15990.000000	3.400000
+portronics	372.333333	3.700000
+primebook	17240.000000	3.700000
+samsung	49500.000000	3.700000
+sounce	89.000000	3.700000
+thomson	13990.000000	3.700000
+tukzer	206.000000	3.550000
+tygot	289.000000	3.700000
+vantro	2400.000000	3.700000
+walker	12190.000000	3.700000
+zebronics	450.666667	3.650000
+# 2 gipoteza 
+all_means = df.groupby('brand')['rating'].mean().sort_values(ascending= False)
+print(f" all means: {all_means}")
+ all means: brand
+portronics          3.700000
+amazon basics       3.700000
+apple               3.700000
+amkette             3.700000
+geonix              3.700000
+boat                3.700000
+futopia             3.700000
+dyazo               3.700000
+gizga essentials    3.700000
+msi                 3.700000
+google              3.700000
+arctic fox          3.700000
+walker              3.700000
+vantro              3.700000
+tygot               3.700000
+microsoft           3.700000
+primebook           3.700000
+thomson             3.700000
+sounce              3.700000
+samsung             3.700000
+hp                  3.685185
+lenovo              3.680000
+asus                3.666667
+acer                3.662500
+dell                3.653333
+zebronics           3.650000
+tukzer              3.550000
+neopticon           3.400000
+Name: rating, dtype: float64
+# 3 gipoteza agar rating review bosa
+q1 = df['screen_size(inches)'].quantile(0.75)
+print(q1)
+# 1000  ta rating_reviewni 25 % ni ortacha bali razmeri inchda     15.6
+
+
+
+above = df[df['screen_size(inches)'] >= q1 ]['rating_review'].mean()
+low = df[df['screen_size(inches)'] < q1 ]['rating_review'].mean()
+print(f" 15 dyum va undan kattalar: {above}")
+print(f" 15 dyum dan kichiklar: {low}")
+15.6
+ 15 dyum va undan kattalar: 324.42857142857144
+ 15 dyum dan kichiklar: 1353.516393442623
+# 4 gipoteza 
+
+higher = df[df['operating_system'] == 'windows 11']['rating'].mean()
+lower = df[df['operating_system'] == 'linux, windows 8']['rating'].mean()
+print(f"higher: {higher} lower: {lower}")
+higher: 3.6999999999999997 lower: 3.7
+#5 gipoteza
+
+q2 = df['rating_review'].quantile(0.75)
+print(q2)
+# 1000  ta odandan 25 % ni ortacha rating_review boyicha boladi  620.0
+above = df[df['rating_review'] >= q2]['rating'].mean()
+lower = df[df['rating_review'] < q2]['rating'].mean()
+print(f" above: {above} lower: {lower}")
+620.0
+ above: 3.678461538461538 lower: 3.674193548387097
+#6 gipoteza
+  #500$    43990 rupee
+  #800$    70384 rupee
+avg = df['price(₹)'].mean()
+print(avg)
+df['price(₹)'].value_counts()
+baho = df[(df['price(₹)'] > 43990.0 ) & (df['price(₹)'] <= 70384.0 )]['rating'].mean()
+m = df.groupby('model_name')['rating'].mean()
+print(baho, m)
+49139.718181818185
+3.668055555555556 model_name
+13-inch macbook air (m4, 2025)    3.7
+14-he0015qu                       3.7
+16-ag1048au                       3.7
+acer alg                          3.7
+apex                              3.7
+                                 ... 
+tuf gaming f15                    3.7
+v15                               3.7
+vivobook go 15                    3.7
+vostro 3530                       3.5
+yoga slim 7                       3.7
+Name: rating, Length: 64, dtype: float64
+# 7 gipoteza
+
+q3 = df['screen_size(inches)'].quantile(0.75)
+print(q3)
+expensive = df[df['screen_size(inches)'] <= q3]['price(₹)'].mean()
+cheaper = df[df['screen_size(inches)'] > q3]['price(₹)'].mean()
+print(f" expensive: {expensive} cheaper: {cheaper}")
+15.6
+ expensive: 44060.14572864322 cheaper: 97274.71428571429
+# 8 gipoteza
+
+
+amd = df[df['cpu_model'] == 'Ryzen 7']['price(₹)'].mean()
+intel = df[df['cpu_model'] == 'Core i5']['price(₹)'].mean()
+print(f"amd: {amd} intel: {intel}")
+amd: 57323.333333333336 intel: 28865.54761904762
+import pandas as pd 
+import numpy as np
+import matplotlib.pyplot as plt
+# 1 gipoteza 
+plt.figure(figsize=(10, 4), dpi= 300)
+plt.scatter(df['price(₹)'], df['rating'])
+plt.xlabel('price(₹)')
+plt.ylabel('rating')
+plt.title('Hypothesis  Price(₹)  &  Rating', fontdict= {'fontname': 'Times New Roman', 'fontsize': 20})
+plt.xticks(rotation= 45)
+plt.yticks(rotation= 45)
+
+#plt.savefi('normativ_scatter.png', dpi= 300)
+plt.show()
+
+# 2 gipoteza with bar
+plt.figure(figsize=(10, 4), dpi= 300)
+avg_rating = df.groupby('brand')['rating'].mean().sort_values(ascending= True)
+plt.bar(avg_rating.index, avg_rating.values, color='skyblue', edgecolor= 'black')
+plt.xlabel('brand')
+plt.ylabel('avarage rating')
+plt.title('Hypothesis  HP and DELL  &  Others', fontdict= {'fontname': 'Times New Roman', 'fontsize': 20})
+plt.xticks(rotation= 60)
+#plt.yticks(rotation= 90)
+
+#plt.savefi('normativ_ferg.png', dpi= 300)
+plt.show()
+
+# 2 gipoteza with barh
+plt.figure(figsize=(8, 12), dpi= 100)
+avg_rating = df.groupby('brand')['rating'].mean().sort_values(ascending= True)
+plt.barh(avg_rating.index, avg_rating.values, color='skyblue', edgecolor= 'black')
+plt.xlabel('brand')
+plt.ylabel('avarage rating')
+plt.title('Hypothesis  HP and DELL  &  Others', fontdict= {'fontname': 'Times New Roman', 'fontsize': 20})
+plt.xticks(rotation= 60)
+#plt.yticks(rotation= 90)
+
+#plt.savefi('normativ_hp.png', dpi= 300)
+plt.show()
+
+# 3 gipoteza with barh
+plt.figure(figsize=(8, 12), dpi= 100)
+plt.bar(avg_rating.index, avg_rating.values, color='skyblue', edgecolor= 'black')
+plt.xlabel('Big & Small')
+plt.ylabel('avarage rating')
+plt.title('Hypothesis  Big  and Small Laptops', fontdict= {'fontname': 'Times New Roman', 'fontsize': 20})
+plt.xticks(rotation= 0)
+plt.yticks(rotation= 0)
+
+df['screen_group'] = np.where(df['screen_size(inches)'] >= 15, 'Big (≥15")', 'Small (<15")')
+avg_rating = df.groupby('screen_group')['rating_review'].mean().sort_values(ascending= True)
+
+
+
+#plt.savefig('normativ.png', dpi= 300)
+plt.show()
+
+#3   Katta ekran o‘lchamiga ega noutbuklar (15 dyuym va undan katta)
+#  kichik ekranli (14 dyuym va undan kichik) noutbuklarga qaraganda yaxshiroq mijoz baholariga ega bo‘ladi. (False)
+# 3 gipoteza agar rating review bosa
+q1 = df['screen_size(inches)'].quantile(0.75)
+print(q1)
+#1000  ta rating_reviewni 25 % ni ortacha bali razmeri inchda     15.6
+
+
+
+above = df[df['screen_size(inches)'] >= q1 ]['rating_review'].mean()
+low = df[df['screen_size(inches)'] < q1 ]['rating_review'].mean()
+print(f" 15 dyum va undan kattalar: {above}")
+print(f" 15 dyum dan kichiklar: {low}")
+15.6
+ 15 dyum va undan kattalar: 324.42857142857144
+ 15 dyum dan kichiklar: 1353.516393442623
+ 
+# 4 gipoteza with barh
+plt.figure(figsize=(11, 13), dpi= 100)
+avg_rating = df.groupby('operating_system')['rating'].mean().sort_values(ascending= True)
+plt.barh(avg_rating.index, avg_rating.values, color='skyblue', edgecolor= 'black')
+plt.xlabel('avarage rating')
+plt.ylabel('operating_system')
+plt.title('Hypothesis  Windows 11  and Windows 8', fontdict= {'fontname': 'Times New Roman', 'fontsize': 20})
+plt.xticks(rotation= 0)
+plt.yticks(rotation= 0)
+
+
+
+#plt.savefig('normativ.png', dpi= 300)
+plt.show()
+
+# 4 gipoteza 
+
+#higher = df[df['operating_system'] == 'windows 11']['rating'].mean()
+#lower = df[df['operating_system'] == 'linux, windows 8']['rating'].mean()
+#print(f"higher: {higher} lower: {lower}")#4   Windows 11 tizimida ishlovchi noutbuklar eski versiyalarda
+#  (masalan, Windows 8) ishlovchi noutbuklarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+#4   Windows 11 tizimida ishlovchi noutbuklar eski versiyalarda
+#  (masalan, Windows 8) ishlovchi noutbuklarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+ 
+#5 gipoteza
+
+#q2 = df['rating_review'].quantile(0.75)
+#print(q2)
+# 1000  ta odandan 25 % ni ortacha rating_review boyicha boladi  620.0
+#above = df[df['rating_review'] >= q2]['rating'].mean()
+#lower = df[df['rating_review'] < q2]['rating'].mean()
+#print(f" above: {above} lower: {lower}")
+#5   Ko‘proq mijoz sharhlariga ega noutbuklar odatda yuqoriroq umumiy reytinglarga ega bo‘ladi.   (False)
+# 5 gipoteza with scatter
+plt.figure(figsize=(6, 7), dpi= 100)
+plt.scatter(df['rating_review'], df['rating'], color='skyblue', edgecolor= 'black')
+plt.xlabel('avarage_rating')
+plt.ylabel('operating_system')
+plt.title('Hypothesis  Windows 11  and Older Versions', fontdict= {'fontname': 'Times New Roman', 'fontsize': 20})
+plt.xticks(rotation= 0)
+plt.yticks(rotation= 0)
+
+
+
+#plt.savefig('normativ.png', dpi= 300)
+plt.show()
+
+ 
+ 
+# 6 gipoteza with bar
+plt.figure(figsize=(6, 7), dpi= 100)
+plt.xlabel('price category')
+plt.ylabel('avarage rating')
+plt.title(" Hypothesis  O'rta narx oralig'idagi laptop & Qolganlar ", fontdict= {'fontname': 'Times New Roman', 'fontsize': 20})
+plt.xticks(rotation= 0)
+plt.yticks(rotation= 0)
+
+labels = ['Budget (<500$)', 'Mid-range (500$–800$)', 'Premium (>800$)']
+bins = [0, 43990, 70384, df['price(₹)'].max()]
+df['price_group'] = pd.cut(df['price(₹)'], bins=bins, labels=labels)
+avg_price = df.groupby('price_group')['rating'].mean().sort_values(ascending= True)
+plt.bar(avg_price.index, avg_price.values, color='skyblue', edgecolor= 'black')
+
+    
+
+#plt.savefig('normativ.png', dpi= 300)
+plt.show()
+C:\Users\user\AppData\Local\Temp\ipykernel_14008\3460121744.py:12: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  avg_price = df.groupby('price_group')['rating'].mean().sort_values(ascending= True)
+
+#6   O‘rta narx oralig‘idagi (500–800 dollar) noutbuklar byudjet yoki premium modellarga nisbatan yuqoriroq baholarga ega bo‘ladi. (False)
+#6 gipoteza
+#   500$    43990 rupee
+#   800$    70384 rupee
+#avg = df['price(₹)'].mean()
+#print(avg)
+#df['price(₹)'].value_counts()
+#baho = df[(df['price(₹)'] > 43990.0 ) & (df['price(₹)'] <= 70384.0 )]['rating'].mean()
+#m = df.groupby('model_name')['rating'].mean()
+#print(baho, m)
+ 
+print(len(df))
+220
+ 
+ 
+#7   screen size yani dyumi kickina laptopla ni narxi qimmat qoganlaga qaraganda (False) 
+# 7 gipoteza
+
+#q3 = df['screen_size(inches)'].quantile(0.75)
+#print(q3)
+#expensive = df[df['screen_size(inches)'] <= q3]['price(₹)'].mean()
+#cheaper = df[df['screen_size(inches)'] > q3]['price(₹)'].mean()
+#print(f" expensive: {expensive} cheaper: {cheaper}")
+# 7 gipoteza with bar
+plt.figure(figsize=(7, 11), dpi= 300)
+plt.xlabel('screen_size')
+plt.ylabel('price')
+plt.title('Hypothesis  Big  &  Small inches with price', fontdict= {'fontname': 'Times New Roman', 'fontsize': 20})
+plt.xticks(rotation= 60)
+plt.yticks(rotation= 90)
+
+bins = [0, 15.6, df['screen_size(inches)'].max()]  
+labels = ['Small (<15.6")', 'Big (≥15.6")']
+df['screen_group'] = pd.cut(df['screen_size(inches)'], bins=bins, labels=labels)
+avg_price = df.groupby('screen_group')['price(₹)'].mean().sort_values(ascending= True)
+plt.bar(avg_price.index, avg_price.values, color='skyblue', edgecolor= 'black')
+
+
+
+#plt.savefig('normativ_ferg.png', dpi= 300)
+plt.show()
+ 
+ 
+#8   cpu model ryzen 7 boganla arzonro narxi core i5 ga qaraganda (False)
+# 8 gipoteza
+
+
+#amd = df[df['cpu_model'] == 'Ryzen 7']['price(₹)'].mean()
+#intel = df[df['cpu_model'] == 'Core i5']['price(₹)'].mean()
+#print(f"amd: {amd} intel: {intel}")
+# 8 gipoteza with barh
+plt.figure(figsize=(8, 12), dpi= 100)
+plt.xlabel('avarage prices')
+plt.ylabel('model names')
+plt.title('Hypothesis  Intel  &  Ryzen', fontdict= {'fontname': 'Times New Roman', 'fontsize': 20})
+plt.xticks(rotation= 0)
+plt.yticks(rotation= 0)
+
+amd = df[df['cpu_model'] == 'Ryzen 7']['price(₹)'].mean()
+intel = df[df['cpu_model'] == 'Core i5']['price(₹)'].mean()
+print(f"amd: {amd}, intel: {intel}")
+models = ['Ryzen 7', 'Core i5']
+avg_prices = [amd, intel]
+plt.barh(models, avg_prices, color='skyblue', edgecolor= 'black')
+
+
+
+#plt.savefi('normativ_hp.png', dpi= 300)
+plt.show()
+amd: 57323.333333333336, intel: 28865.54761904762
+
+ 
+ 
+# 8-gipoteza: Ryzen 7 vs Core i5 price comparison (vertical bar)
+
+amd = df[df['cpu_model'] == 'Ryzen 7']['price(₹)'].mean()
+intel = df[df['cpu_model'] == 'Core i5']['price(₹)'].mean()
+
+print(f"Ryzen 7 average price: {amd}")
+print(f"Core i5 average price: {intel}")
+
+models = ['Ryzen 7', 'Core i5']
+avg_prices = [amd, intel]
+
+plt.figure(figsize=(7, 10), dpi=120)
+plt.bar(models, avg_prices, color=['orange', 'skyblue'], edgecolor='black')
+plt.ylabel('Average Price (₹)')
+plt.xlabel('CPU Model')
+plt.title('Average Laptop Prices: Ryzen 7 vs Core i5', 
+          fontdict={'fontname': 'Times New Roman', 'fontsize': 18})
+plt.show()
+Ryzen 7 average price: 57323.333333333336
+Core i5 average price: 28865.54761904762
+
+ 
+ 
