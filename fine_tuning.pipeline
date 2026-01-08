@@ -1,0 +1,251 @@
+!pip install huggingface_hub==0.25.0
+!pip install -U transformers
+!pip install -U datasets
+!pip install -U accelerate
+!pip install -U bitsandbytes
+!pip install -U peft
+!pip install -U trl
+Collecting huggingface_hub==0.25.0
+  Downloading huggingface_hub-0.25.0-py3-none-any.whl.metadata (13 kB)
+Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from huggingface_hub==0.25.0) (3.16.1)
+Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.10/dist-packages (from huggingface_hub==0.25.0) (2024.6.1)
+Requirement already satisfied: packaging>=20.9 in /usr/local/lib/python3.10/dist-packages (from huggingface_hub==0.25.0) (24.1)
+Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.10/dist-packages (from huggingface_hub==0.25.0) (6.0.2)
+Requirement already satisfied: requests in /usr/local/lib/python3.10/dist-packages (from huggingface_hub==0.25.0) (2.32.3)
+Requirement already satisfied: tqdm>=4.42.1 in /usr/local/lib/python3.10/dist-packages (from huggingface_hub==0.25.0) (4.66.5)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in /usr/local/lib/python3.10/dist-packages (from huggingface_hub==0.25.0) (4.12.2)
+Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests->huggingface_hub==0.25.0) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/dist-packages (from requests->huggingface_hub==0.25.0) (3.10)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests->huggingface_hub==0.25.0) (2.2.3)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.10/dist-packages (from requests->huggingface_hub==0.25.0) (2024.8.30)
+Downloading huggingface_hub-0.25.0-py3-none-any.whl (436 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 436.4/436.4 kB 13.6 MB/s eta 0:00:00
+Installing collected packages: huggingface_hub
+  Attempting uninstall: huggingface_hub
+    Found existing installation: huggingface-hub 0.24.7
+    Uninstalling huggingface-hub-0.24.7:
+      Successfully uninstalled huggingface-hub-0.24.7
+Successfully installed huggingface_hub-0.25.0
+Requirement already satisfied: transformers in /usr/local/lib/python3.10/dist-packages (4.44.2)
+Collecting transformers
+  Downloading transformers-4.48.3-py3-none-any.whl.metadata (44 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.4/44.4 kB 1.5 MB/s eta 0:00:00
+...
+Downloading trl-0.15.0-py3-none-any.whl (318 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 318.3/318.3 kB 11.3 MB/s eta 0:00:00
+Installing collected packages: trl
+Successfully installed trl-0.15.0
+Output is truncated. View as a scrollable element or open in a text editor. Adjust cell output settings...
+# Import necessary libraries for the fine-tuning pipeline
+import os
+import torch
+from datasets import load_dataset  # For loading the medical dataset
+from transformers import (AutoModelForCausalLM,  # For loading pre-trained language models
+                         AutoTokenizer,  # For tokenizing text data
+                         BitsAndBytesConfig,  # For model quantization settings
+                         TrainingArguments,  # For configuring training hyperparameters
+                         logging)
+from peft import LoraConfig, get_peft_model  # Parameter-Efficient Fine-Tuning with LoRA
+from kaggle_secrets import UserSecretsClient  # For securely accessing API tokens in Kaggle
+from huggingface_hub import login  # For authenticating with HuggingFace
+from trl import SFTTrainer, setup_chat_format  # For supervised fine-tuning and chat formatting
+import bitsandbytes as bnb  # For 4-bit quantization to reduce memory usage
+
+# Set up authentication with HuggingFace using a secure token from Kaggle secrets
+user_secrets = UserSecretsClient()
+hf_token = user_secrets.get_secret("huggingface")  # Retrieve the token without exposing it in code
+login(token=hf_token)  # Authenticate with HuggingFace to download models and datasets
+
+# Define the model and dataset to use
+base_model = "google/gemma-2-2b-it"  # Starting with Google's Gemma 2 2B instruction-tuned model
+new_model = "Gemma-2-2b-it-ChatDoctor"  # Name for our fine-tuned medical assistant model
+dataset_name = "lavita/ChatDoctor-HealthCareMagic-100k"  # Medical Q&A dataset with 100k examples
+
+# Configure hardware acceleration based on the GPU capabilities
+if torch.cuda.get_device_capability()[0] >= 8:
+   torch_dtype = torch.bfloat16  # Use bfloat16 precision on newer GPUs (Ampere architecture or newer)
+   attn_implementation = "flash_attention_2"  # Use Flash Attention 2 for faster training on modern GPUs
+else:
+   torch_dtype = torch.float16  # Fall back to float16 on older GPUs
+   attn_implementation = "eager"  # Use standard attention implementation on older hardware
+
+# Configure model quantization settings to reduce memory requirements
+bnb_config = BitsAndBytesConfig(
+   load_in_4bit=True,  # Load model in 4-bit precision instead of 16-bit to save memory
+   bnb_4bit_quant_type="nf4",  # Use normalized float 4 quantization for better quality
+   bnb_4bit_compute_dtype=torch_dtype,  # Use the precision determined by GPU capabilities
+   bnb_4bit_use_double_quant=True,  # Apply double quantization for additional memory savings
+)
+The token has not been saved to the git credentials helper. Pass `add_to_git_credential=True` in this function directly or `--add-to-git-credential` if using via `huggingface-cli` if you want to set the git credential as well.
+Token is valid (permission: fineGrained).
+Your token has been saved to /root/.cache/huggingface/token
+Login successful
+# Load the pre-trained model with quantization and hardware optimization settings
+model = AutoModelForCausalLM.from_pretrained(
+  base_model,                           # Use the Gemma 2 2B model we specified earlier
+  quantization_config=bnb_config,       # Apply the 4-bit quantization configuration to reduce memory usage
+  device_map="auto",                    # Automatically manage model placement across available GPUs/CPU
+  attn_implementation=attn_implementation  # Use the attention implementation we selected based on GPU capabilities
+)
+
+# Load the tokenizer for the same model
+tokenizer = AutoTokenizer.from_pretrained(
+  base_model,                           # Use the tokenizer that matches our base model
+  trust_remote_code=True                # Allow running remote code in the tokenizer implementation for full functionality
+)
+
+# This function identifies all linear layers in the model that should be modified with LoRA
+def find_all_linear_names(model):
+  cls = bnb.nn.Linear4bit                # Look specifically for 4-bit quantized linear layers
+  lora_module_names = set()              # Create an empty set to store eligible layer names
+  
+  # Iterate through all named modules in the model
+  for name, module in model.named_modules():
+      if isinstance(module, cls):        # Check if the module is a 4-bit linear layer
+          names = name.split('.')        # Split the full path name into components
+          if len(names) == 1:            # If it's a top-level module
+              lora_module_names.add(names[0])
+          else:                          # If it's a nested module
+              lora_module_names.add(names[-1])  # Add only the base name of the module
+              
+  lora_module_names.discard('lm_head')   # Remove the language model head, which shouldn't be modified with LoRA
+  return list(lora_module_names)         # Return the list of eligible layer names
+
+# Get the list of modules that will be fine-tuned using LoRA
+modules = find_all_linear_names(model)
+from peft import LoraConfig, get_peft_model
+
+peft_config = LoraConfig(
+   r=16,                    
+   lora_alpha=32,           
+   lora_dropout=0.05,      
+   bias="none",             
+   task_type="CAUSAL_LM",   
+   target_modules=modules  
+)
+
+tokenizer.chat_template = None 
+model, tokenizer = setup_chat_format(model, tokenizer)
+model = get_peft_model(model, peft_config)
+
+import re
+from datasets import load_dataset
+
+dataset = load_dataset(
+   dataset_name,
+   split="all",           
+   cache_dir="./cache"    
+)
+
+dataset = dataset.shuffle(seed=42).select(range(2000))
+
+def clean_text(text):
+   text = re.sub(r'\b(?:www\.[^\s]+|http\S+)', '', text)                   
+   text = re.sub(r'\b(?:aCht Doctor(?:.com)?(?:.in)?|www\.(?:google|yahoo)\S*)', '', text)
+   text = re.sub(r'\s+', ' ', text)                                    
+   return text.strip()
+
+def format_chat_template(row):
+   cleaned_instruction = clean_text(row["instruction"])  # Очистка инструкции
+   cleaned_input = clean_text(row["input"])             # Очистка входных данных
+   cleaned_output = clean_text(row["output"])           # Очистка выходных данных
+   
+   row_json = [
+       {"role": "system", "content": cleaned_instruction},  
+       {"role": "user", "content": cleaned_input},
+       {"role": "assistant", "content": cleaned_output}
+   ]
+   row["text"] = tokenizer.apply_chat_template(row_json, tokenize=False)
+   return row
+
+dataset = dataset.map(format_chat_template, num_proc=4)
+dataset = dataset.train_test_split(test_size=0.1)
+data_collator = lambda batch: tokenizer(
+   batch["text"], 
+   return_tensors="pt",    
+   padding=True,           
+   truncation=True         
+)
+training_args = TrainingArguments(
+    output_dir=new_model,
+    per_device_train_batch_size=1,
+    per_device_eval_batch_size=1,
+    gradient_accumulation_steps=2,
+    optim="paged_adamw_32bit",
+    num_train_epochs=1,
+    eval_strategy="steps",
+    eval_steps=200,
+    save_steps=500,
+    logging_steps=1,
+    warmup_steps=10,
+    logging_strategy="steps",
+    learning_rate=0.0002,
+    fp16=True,
+    bf16=False,
+    group_by_length=True,
+    load_best_model_at_end=False,
+    report_to=[]
+)
+
+trainer = SFTTrainer(
+    model=model,
+    train_dataset=dataset["train"],
+    eval_dataset=dataset["test"],
+    peft_config=peft_config,
+    tokenizer=tokenizer,
+    args=training_args,
+)
+
+model.config.use_cache = False
+trainer.train()
+ [900/900 24:19, Epoch 1/1]
+Step	Training Loss	Validation Loss
+200	4.358800	2.599404
+400	4.487300	2.557570
+600	4.295300	2.509958
+800	4.730500	2.485965
+merged_model = model.merge_and_unload()
+merged_model.save_pretrained(new_model)
+merged_model.push_to_hub(new_model, use_temp_dir=False)
+from transformers import GenerationConfig
+
+messages = [
+    {"role": "system", "content": "You are a medical expert specializing in respiratory diseases. You should prescribe some medical drugs"},
+    {"role": "user", "content": "I have a persistent cough, night sweats, and recent weight loss. I’ve been to multiple doctors with no diagnosis yet. Could these symptoms be related to tuberculosis or another serious illness? Please provide a detailed answer considering possible causes and recommended next steps. Write down medicines that can cure my illness"}
+]
+
+prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+inputs = tokenizer(prompt, return_tensors='pt', padding=True, truncation=True).to("cuda")
+
+outputs = model.generate(
+    **inputs,
+    max_length=350,          
+    top_k=50,                
+    top_p=0.85,               
+    temperature=0.3,         
+    no_repeat_ngram_size=3,  
+)
+
+response = tokenizer.decode(outputs[0], skip_special_tokens=True).split("assistant")[-1].strip()
+print(response)
+from transformers import GenerationConfig
+
+messages = [
+    {"role": "system", "content": "You are a medical expert specializing in respiratory diseases."},
+    {"role": "user", "content": "I have a persistent cough, night sweats, and recent weight loss. I’ve been to multiple doctors with no diagnosis yet. Could these symptoms be related to tuberculosis or another serious illness? Please provide a detailed answer considering possible causes and recommended next steps."}
+]
+
+prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+inputs = tokenizer(prompt, return_tensors='pt', padding=True, truncation=True).to("cuda")
+
+outputs = model.generate(
+    **inputs,
+    max_length=350,          
+    top_k=50,                
+    top_p=0.85,               
+    temperature=0.3,         
+    no_repeat_ngram_size=3,  
+)
+
+response = tokenizer.decode(outputs[0], skip_special_tokens=True).split("assistant")[-1].strip()
+print(response)
